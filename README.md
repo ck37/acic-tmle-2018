@@ -105,8 +105,7 @@ van der Laan, M. J., & Rose, S. (2011). [Targeted learning: causal inference for
 
 ## License
 
-&copy; 2017 Jonathan Levy, Chris J. Kennedy, Caleb H. Miles, Ivana Malenica,
-Nima Hejazi, Andre Kurepa Waschka, and Alan E. Hubbard.
+&copy; 2018 
 
 The contents of this repository are distributed under the MIT license. See file
 `LICENSE` for details.
