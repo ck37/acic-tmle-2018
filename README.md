@@ -1,15 +1,9 @@
 # Targeted Learning for the Sample Average Treatment Effect on Treated Units (SATT)
 
-**2017 Atlantic Causal Inference Conference Data Analysis
-Challenge** [(pdf)](https://causal.unc.edu/files/2017/05/SecondAnnualCausalInferenceDataAnalysisChallenge.pdf)
+**2018 Atlantic Causal Inference Conference Data Analysis
+Challenge**
 
-**Authors**: [Jonathan Levy](https://github.com/jlstiles), [Chris J.
-Kennedy](https://github.com/ck37), [Caleb H.
-Miles](https://github.com/calebhmiles), [Ivana
-Malenica](https://github.com/podTockom),
-[Nima Hejazi](https://github.com/nhejazi), [Andre Kurepa
-Waschka](https://github.com/akwaschka), and [Alan E.
-Hubbard](http://hubbard.berkeley.edu/).
+**Under development**
 
 **Description**: Targeted minimum loss-based estimation (TMLE) was implemented
 using weighted logistic regression fluctuation. The pooled outcome regression and
