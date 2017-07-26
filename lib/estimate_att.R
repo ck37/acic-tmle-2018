@@ -326,9 +326,11 @@ estimate_att =
     }
     
     # TODO: test this!
-    Q0W = as.matrix(m.SL.A0$library.predict[1:n,m.SL.A0$coef!=0]) %*% m.SL.A0$coef[m.SL.A0$coef!=0]
-    # Q1W = sl_outcome$SL.predict[n + 1:n]
-    Q1W = as.matrix(m.SL.A1$library.predict[n+1:n,m.SL.A1$coef!=0]) %*% m.SL.A1$coef[m.SL.A1$coef!=0]
+    Q0W = sl_outcome$SL.predict[1:n]
+    Q1W = sl_outcome$SL.predict[n + 1:n]
+    # SuperLearner should be robust to failed algorithms now.
+    #Q0W = as.matrix(m.SL.A0$library.predict[1:n,m.SL.A0$coef!=0]) %*% m.SL.A0$coef[m.SL.A0$coef!=0]
+    #Q1W = as.matrix(m.SL.A1$library.predict[n+1:n,m.SL.A1$coef!=0]) %*% m.SL.A1$coef[m.SL.A1$coef!=0]
     
     # Q0W = m.SL.A0$SL.predict
     # Q1W = m.SL.A1$SL.predict
@@ -386,10 +388,12 @@ estimate_att =
     }
 
     # Order of predictions is Q0W then Q1W.
-    # Q0W = sl_outcome$SL.predict[1:n]
-    Q0W = as.matrix(sl_outcome$library.predict[1:n,sl_outcome$coef!=0]) %*% sl_outcome$coef[sl_outcome$coef!=0]
-    # Q1W = sl_outcome$SL.predict[n + 1:n]
-    Q1W = as.matrix(sl_outcome$library.predict[(n+1:n),sl_outcome$coef!=0]) %*% sl_outcome$coef[sl_outcome$coef!=0]
+    Q0W = sl_outcome$SL.predict[1:n]
+    Q1W = sl_outcome$SL.predict[n + 1:n]
+    # SL should be robust to bad algorithms as of July 2017 CRAN release.
+    
+    #Q0W = as.matrix(sl_outcome$library.predict[1:n,sl_outcome$coef!=0]) %*% sl_outcome$coef[sl_outcome$coef!=0]
+    #Q1W = as.matrix(sl_outcome$library.predict[(n+1:n),sl_outcome$coef!=0]) %*% sl_outcome$coef[sl_outcome$coef!=0]
     
     QAW = ifelse(A == 1, Q1W, Q0W)
 
@@ -459,7 +463,7 @@ estimate_att =
       new1     = model.matrix(~ A + Xscr, data = dat1)
       
       # If still getting NaNs, return NULL for CI
-      if(sum(is.nan(Sigma)) > 0){
+      if (sum(is.nan(Sigma)) > 0) {
         cat("Unit-level effect inference failed.\n")
         ci_lower = NULL
         ci_upper = NULL
