@@ -52,9 +52,9 @@ data = gendata(n, g0_linear, c0, Q0_1)
 covariates_Q = colnames(data)[c(1,3:6)]
 covariates_g = colnames(data)[3:6]
 
-lrnr_step = make_learner(Lrnr_step)
 lrnr_glm = make_learner(Lrnr_glm)
-lrnr_stack_Q = make_learner(Stack, lrnr_step, lrnr_glm)
+lrnr_bartMachine = make_learner(Lrnr_bartMachine)
+lrnr_stack_Q = make_learner(Stack, lrnr_glm, lrnr_bartMachine)
 metalearner_eval_Q = metalearner_logistic_binomial
 
 metalearnerLogLik <- make_learner(Lrnr_optim)
