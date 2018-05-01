@@ -92,21 +92,21 @@ subset_fold_training <- function(fold, subset_index){
                                     use_future=FALSE)$fold
   
   # make the task to train Qbar on uncensored data
-  dataQ_sub = make_sl3_Task(data = df, covariates = covariatesQ, outcome = "Y",
+  dataQ_sub = make_sl3_Task(data = df, covariates = covariates_Q, outcome = "Y",
                                folds = subsetted_folds)
   
   # We will predict on the whole validation set eventually
-  dataQ = make_sl3_Task(data = df, covariates = covariatesQ, outcome = "Y",
+  dataQ = make_sl3_Task(data = df, covariates = covariates_Q, outcome = "Y",
                                 folds = folds)
   
   # make tasks for the A=1 and A=0 subsets
-  dataQ1 = dataQ0 = dataQ$data
+  dataQ1 = dataQ0 = df
   dataQ1$A = 1
   dataQ0$A = 0
   
-  newQ1 = make_sl3_Task(data = dataQ1, covariates = covariatesQ, outcome = "Y",
+  newQ1 = make_sl3_Task(data = dataQ1, covariates = covariates_Q, outcome = "Y",
                        folds = folds)
-  newQ0 = make_sl3_Task(data = dataQ0, covariates = covariatesQ, outcome = "Y",
+  newQ0 = make_sl3_Task(data = dataQ0, covariates = covariates_Q, outcome = "Y",
                        folds = folds)
   # train Qbar on the folds using uncensored 
   cv_lrnr_fit = cv_lrnr$train(dataQ_sub)
@@ -138,7 +138,7 @@ subset_fold_training <- function(fold, subset_index){
   Q0k = metalearner_logistic_binomial(coefQ, as.matrix(cv_lrnr_fit$predict(newQ0)))
   # setting Y equal to Qk for censored--probably unnecessary and dangerous but not fucking
   # anything right now
-  Y[C==1] = Qk[C==1]
+  Y[C==1] = NA
 
   # fit and predict on folds for g and c
   data_g = make_sl3_Task(data = df, covariates = covariates_g, outcome = "A",
@@ -150,6 +150,7 @@ subset_fold_training <- function(fold, subset_index){
                          covariates = names(gk_stack), outcome = "A")
   gfit = metalearnerQ$train(Zg_cols)
   coefg = gfit$coefficients
+  
   # coefs to be used later
   coefg
   gk = metalearner_logistic_binomial(coefg, as.matrix(gk_stack))
@@ -159,6 +160,8 @@ subset_fold_training <- function(fold, subset_index){
                          folds = folds)
   
   cv_lrnr_fitc = cv_lrnr$train(data_c)
+  
+  # these are prob of cens scores for A=0  and A=1
   ck_stack1 = cv_lrnr_fitc$predict(newQ1)
   ck_stack0 = cv_lrnr_fitc$predict(newQ0)
   ck_stack = cv_lrnr_fitc$predict()
@@ -175,7 +178,7 @@ subset_fold_training <- function(fold, subset_index){
   # feeding into susan's package to target'
   pDelta1 = matrix(c(ck0, ck1), ncol = 2)
   Q = matrix(c(Q0k, Q1k), ncol = 2)
-  head(Delta)
+  head(pDelta1)
   head(Q)
   W = df[,3:6]
   tmle1 = tmle(Y=Y,A=A,W=W, Delta = 1-C,Q = Q, pDelta1 = pDelta1, g1W = gk, family = 'binomial',
@@ -203,6 +206,10 @@ subset_fold_training <- function(fold, subset_index){
   gfit = lrnr_stack$train(data_g)
   g1W = metalearner_logistic_binomial(coefg, as.matrix(gfit$predict()))
   
+  newQ1 = make_sl3_Task(data = dataQ1, covariates = covariates_Q, outcome = "C",
+                        folds = folds)
+  newQ0 = make_sl3_Task(data = dataQ0, covariates = covariates_Q, outcome = "C",
+                        folds = folds)
   data_c = make_sl3_Task(data = df, covariates = covariates_Q, outcome = "C")
   cfit = lrnr_stack$train(data_c)
   c1_stack = as.matrix(cfit$predict(newQ1))
@@ -212,10 +219,11 @@ subset_fold_training <- function(fold, subset_index){
   
   A = df$A
   C = df$C
+  Y = df$Y
   
   H1W = (1/g1W)/cA1
   H0W =  (1/(1 - g1W))/cA0
-  HAW = A*H1W + (1-A)*H0W
+  HAW = A*H1W - (1-A)*H0W
 
   # funal update
   Q1star = plogis(qlogis(Q1W) + eps[2]*H1W)
@@ -224,13 +232,13 @@ subset_fold_training <- function(fold, subset_index){
   psi = mean(Q1star - Q0star)
   
   # is not that the correct IC
-  Dstar = (1-C)*(HAW)*(df$Y - Qstar) + Q1star - Q0star - psi
+  Dstar = (1-C)*(HAW)*(Y - Qstar) + Q1star - Q0star - psi
   se = sd(Dstar)/sqrt(n)
   se^2
   
   # comparing with Gruber's initial estimate--should be close'
   c(psi = psi, se = se , left = psi - 1.96*se, right = psi + 1.96*se)
-  tmle1
+  tmle1$estimates$ATE
   
   # The truth 
   truth = mean(with(df, Q0_1(1,W1,W2,W3,W4) - Q0_1(0,W1,W2,W3,W4)))
