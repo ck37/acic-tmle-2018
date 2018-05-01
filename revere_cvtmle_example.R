@@ -67,7 +67,7 @@ subset_fold_training <- function(fold, subset_index){
 # example of revere cv-tmle
 
 # generate data and declare covs
-  n=10000
+  n=1000
   data = gendata(n, g0_linear, c0, Q0_1)
   df = data
   covariates_Q = covariates_c = colnames(df)[c(1,3:6)]
@@ -80,7 +80,7 @@ subset_fold_training <- function(fold, subset_index){
   strata_ids[df$C==0] = "C0"
   
   # make the balanced folds--these will be used later!
-  folds <- make_folds(n)
+  folds <- make_folds(n, strata_ids = strata_ids)
   
   # subset index the folds because we can only fit on uncens
   subset_index <- which(df$C == 0)
@@ -92,28 +92,28 @@ subset_fold_training <- function(fold, subset_index){
                                     use_future=FALSE)$fold
   
   # make the task to train Qbar on uncensored data
-  dataQ_sub = make_sl3_Task(data = df, covariates = covariates_Q, outcome = "Y",
+  QAW_task_sub = make_sl3_Task(data = df, covariates = covariates_Q, outcome = "Y",
                                folds = subsetted_folds)
   
   # We will predict on the whole validation set eventually
-  dataQ = make_sl3_Task(data = df, covariates = covariates_Q, outcome = "Y",
+  QAW_task = make_sl3_Task(data = df, covariates = covariates_Q, outcome = "Y",
                                 folds = folds)
   
   # make tasks for the A=1 and A=0 subsets
-  dataQ1 = dataQ0 = df
-  dataQ1$A = 1
-  dataQ0$A = 0
+  dataQ1W = dataQ0W = df
+  dataQ1W$A = 1
+  dataQ0W$A = 0
   
-  newQ1 = make_sl3_Task(data = dataQ1, covariates = covariates_Q, outcome = "Y",
+  Q1W_task = make_sl3_Task(data = dataQ1W, covariates = covariates_Q, outcome = "Y",
                        folds = folds)
-  newQ0 = make_sl3_Task(data = dataQ0, covariates = covariates_Q, outcome = "Y",
+  Q0W_task = make_sl3_Task(data = dataQ0W, covariates = covariates_Q, outcome = "Y",
                        folds = folds)
   # train Qbar on the folds using uncensored 
-  cv_lrnr_fit = cv_lrnr$train(dataQ_sub)
+  cv_lrnr_fit = cv_lrnr$train(QAW_task_sub)
   # predict on uncensored to fit the metalearner
-  Qk_stack_sub = cv_lrnr_fit$predict(dataQ_sub)
+  QAW_stack_sub = cv_lrnr_fit$predict(QAW_task_sub)
   # predict on censored as well for use as placeholders--might be superfluous
-  Qk_stack = cv_lrnr_fit$predict(dataQ)
+  QAW_stack = cv_lrnr_fit$predict(QAW_task)
 
   # bookeeping indices
   inds = unlist(lapply(folds, FUN = function(x) x$validation_set))
@@ -127,8 +127,8 @@ subset_fold_training <- function(fold, subset_index){
   A_sub = df$A[subsetted_inds]
 
   # fit the metalearner and get coefs to be used later
-  Z_cols = make_sl3_Task(data = cbind(Y = Y_sub, Qk_stack_sub), 
-                         covariates = names(Qk_stack), outcome = "Y")
+  Z_Q = make_sl3_Task(data = cbind(Y = Y_sub, Qk_stack_sub), 
+                         covariates = names(QAW_stack), outcome = "Y")
   Qfit = metalearnerQ$train(Z_cols)
   coefQ = Qfit$coefficients
   coefQ
