@@ -64,10 +64,10 @@ revere.cvtmle = function(data,covariates_Q, covariates_c = NULL, covariates_g, l
   inds = unlist(lapply(folds, FUN = function(x) x$validation_set))
   subsetted_inds = unlist(lapply(subsetted_folds, FUN = function(x) x$validation_set))
   
-  Y = data$Y[inds]
-  C = data$C[inds]
-  A = data$A[inds]
-  Y_sub = data$Y[subsetted_inds]
+  Y = data$Y
+  C = data$C
+  A = data$A
+  Y_sub = data$Y[order(subsetted_inds)]
   
   # fit the metalearner and get coefs to be used later
   Z_Q = make_sl3_Task(data = cbind(Y = Y_sub, QAW_stack_sub), 
@@ -136,7 +136,7 @@ revere.cvtmle = function(data,covariates_Q, covariates_c = NULL, covariates_g, l
   # feeding into susan's package to target only--very fast
   pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
   Q = matrix(c(Q0W, Q1W), ncol = 2)
-  W = data[inds,3:6]
+  W = data[,3:6]
   tmle1 = tmle(Y=Y,A=A,W=W, Delta = 1-C,Q = Q, pDelta1 = pDelta1, g1W = g1W, family = 'binomial',
                fluctuation = "logistic")
   
