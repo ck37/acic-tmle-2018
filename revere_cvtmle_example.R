@@ -10,7 +10,7 @@ library(tmle)
 library(here)
 
 # Requires reverse_cvtmle.R
-# source("revere_cvtmle.R")
+source("R/revere_cvtmle.R")
 debug(revere.cvtmle)
 # Below we will perform a revere CV-TMLE
 # generate the data
@@ -53,11 +53,16 @@ if (F) {
   lrnr_bayesglm = make_learner(Lrnr_bayesglm)
   lrnr_xgboost = make_learner(Lrnr_xgboost)$initialize(nrounds = 1000, eta = .01, nthread = 4)
   lrnr_stack_Q = make_learner(Stack, lrnr_glm, lrnr_mean)
-  metalearner_eval_Q = metalearner_logistic_binomial
   
-  metalearnerLogLik <- make_learner(Lrnr_optim)
-  metalearner_Q = metalearnerLogLik$initialize(learner_function = metalearner_logistic_binomial,
-                                              loss_function = loss_loglik_binomial)
+  # for log-lik metalearner
+  # metalearner_eval_Q = metalearner_logistic_binomial
+  # metalearnerLogLik <- make_learner(Lrnr_optim)
+  # metalearner_Q = metalearnerLogLik$initialize(learner_function = metalearner_logistic_binomial,
+  #                                             loss_function = loss_loglik_binomial)
+
+  # for nnls metalearner
+  metalearner_eval_Q = metalearner_linear
+  metalearner_Q = make_learner(Lrnr_nnls)
   
   
   n=1000
@@ -66,7 +71,7 @@ if (F) {
   res_revere = revere.cvtmle(data = data,covariates_Q = covariates_Q, 
                              covariates_g = covariates_g, lrnr_stack_Q = lrnr_stack_Q,
                              metalearner_Q = metalearner_Q, 
-                             metalearner_eval_Q = metalearner_logistic_binomial)
+                             metalearner_eval_Q = metalearner_eval_Q)
   
   res_revere$cover
   res_revere$res
