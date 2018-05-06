@@ -1,4 +1,4 @@
-# Targeted Learning for the Sample Average Treatment Effect on Treated Units (SATT)
+# Targeted learning with censored outcomes
 
 **2018 Atlantic Causal Inference Conference Data Analysis
 Challenge**
@@ -6,22 +6,14 @@ Challenge**
 **Under development**
 
 **Description**: Targeted minimum loss-based estimation (TMLE) was implemented
-using weighted logistic regression fluctuation. The pooled outcome regression and
-treatment mechanism were modeled using super learning, with a library consisting
-of logistic regression, gradient boosted machines (6 configurations), multivariate adaptive
-regression splines, random forest, neural networks, lasso, elastic net, and bayesian additive trees. Covariates supplied to the [SuperLearner](https://github.com/ecpolley/SuperLearner) were pre-screened based on their univariate association with the outcome.
+using ...
 
-**Acknowledgments**: We thank Susan Gruber for theoretical inspiration and for
-sharing the source code from her & Mark's 2016 competition entry. We also
-thank [Mark van der Laan](https://www.stat.berkeley.edu/~laan/about/bio/) for
-helpful discussions.
+**Acknowledgments**: We thank ...
 
-**Expected runtime**: 160 seconds per dataset of 250 observations and 58
+**Expected runtime**: TBD
 covariates.
 
-**Notes**: We assume no missing data in the datasets. We do not include
-inference for the unit-level causal estimates as those are not asymptotically
-linear within the targeted learning framework.
+**Notes**: ...
 
 ## Requirements
 
