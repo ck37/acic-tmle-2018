@@ -5,14 +5,16 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-source("lib/function_library.R")
-# TODO: load all .R files in R/
-# TODO: load/install necessary packages
+source("R/function_library.R")
+# Load/install necessary packages.
+startup(auto_install = FALSE, verbose = TRUE)
+# Load all .R files in R/
+ck37r::load_all_code("R")
 ```
 
 ## Configure analysis
 
-```{r}
+```{r config}
 (conf = list(
   input_dir_counterfactuals = "data-raw/practice-censoring",
   input_file_covariates = "data-raw/x.csv",
@@ -24,7 +26,7 @@ source("lib/function_library.R")
 
 ## Run analysis
 
-```{r}
+```{r run_analysis}
 
 # Generate analyses
 results =
@@ -34,9 +36,16 @@ results =
     verbose = TRUE)
 ```
 
+## Evaluate estimates
+
+If we have counterfactual files.
+
+```{r eval_estimates}
+```
+
 ## Create output files
 
-```{r}
+```{r create_output}
 output_files =
   create_output_files(
     results,
@@ -47,6 +56,6 @@ output_files =
 
 ## Submit entry
 
-```{r}
+```{r submit_entry}
 # Submit entry programmatically using R.
 ```
