@@ -1,0 +1,52 @@
+---
+title: "Run analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("lib/function_library.R")
+# TODO: load all .R files in R/
+# TODO: load/install necessary packages
+```
+
+## Configure analysis
+
+```{r}
+(conf = list(
+  input_dir_counterfactuals = "data-raw/practice-censoring",
+  input_file_covariates = "data-raw/x.csv",
+  output_file_ate = "exports/ate-test.csv",
+  # IPO = Individual potential outcomes
+  output_dir_ipo = "exports/ipo-test"
+))
+```
+
+## Run analysis
+
+```{r}
+
+# Generate analyses
+results =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    verbose = TRUE)
+```
+
+## Create output files
+
+```{r}
+output_files =
+  create_output_files(
+    results,
+    output_file_ate = conf$output_file_ate,
+    output_dir_ipo = conf$output_dir_ipo,
+    verbose = TRUE)
+```
+
+## Submit entry
+
+```{r}
+# Submit entry programmatically using R.
+```
