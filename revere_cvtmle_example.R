@@ -43,6 +43,7 @@ Q0_1 = function (A, W1, W2, W3, W4) {
 # metalearnerQ =  make_learner(Lrnr_nnls)
 if (F) {
   # Run manually.
+  
   n=1000
   data = gendata(n, g0_linear, c0, Q0_1)
   covariates_Q = colnames(data)[c(1,3:6)]
@@ -64,7 +65,7 @@ if (F) {
   metalearner_eval_Q = metalearner_linear
   metalearner_Q = make_learner(Lrnr_nnls)
   
-  
+  set.seed(10)
   n=1000
   data = gendata(n, g0_linear, c0, Q0_1)
   
@@ -75,6 +76,5 @@ if (F) {
   
   res_revere$cover
   res_revere$res
-  res_revere$coefs
   res_revere$SLcoefs
 }
