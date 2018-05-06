@@ -218,6 +218,9 @@ estimate_att =
                     family = "binomial",
                     # Stratify the CV folds to maximize power.
                     cvControl = list(V = V, stratifyCV = T)))
+  
+  # TODO: check if predictions go outside [0, 1] and warn if so.
+  # That implies we need to fix one or more learners.
 
   if (class(g.SL) == "try-error") {
     if (verbose) {

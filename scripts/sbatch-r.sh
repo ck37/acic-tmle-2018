@@ -50,4 +50,6 @@ module load lapack
 # GPU computation modules. CUDA is 7.5, cudnn is 4.0.
 module load cuda cudnn
 
+# Add job id to output file in case multiple versions of script are running
+# simultaneously.
 R CMD BATCH --no-save --no-restore ${file} ${dir_output}/${file}-${SLURM_JOB_ID}.out

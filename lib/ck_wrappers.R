@@ -68,6 +68,7 @@ length(sl_ksvm$names)
 SL.xgboost_threads_4 = function(...) SL.xgboost(..., nthread = 4)
 
 # Faster glmnet.
+# TODO: use multicore via foreach for glmnet.
 SL.glmnet_fast = function(...) SL.glmnet(..., nlambda = 20, nfolds = 5)
 
 # Faster randomForest.

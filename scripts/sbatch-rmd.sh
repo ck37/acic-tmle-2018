@@ -51,6 +51,7 @@ module load cuda cudnn
 
 # knitr does not support subdirectories - need to use cd.
 cd $dir_output
+
 # This assumes we are in a subdirectory; remove "../" if not.
 Rscript -e "knitr::knit('../$file.Rmd', '$file.md')" 2>&1
 
