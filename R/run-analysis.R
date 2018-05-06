@@ -8,6 +8,8 @@ run_analysis =
     input_cf_pattern = "_cf.csv$",
     input_file_covariates = "data-raw/x.csv",
     id_field = "sample_id",
+    outcome_field = "y",
+    treatment_field = "z",
     verbose = TRUE) {
   
   # Check that input_dir_counterfactuals exists
@@ -68,14 +70,21 @@ run_analysis =
                  # Keep all rows in CF, but ok if we drop rows in covariates.
                  all.x = TRUE, all.y = FALSE)
     
+    analysis_data = data
+    
+    # Remove the sample_id from the data that we analyze.
+    analysis_data[[id_field]] = NULL
+    
     # Run TMLE analysis.
     # TODO: determine function to run; pass in appropriate data.
     # Should return population ATE with inference, plus df of individual potential outcomes.
+    tmle_result = estimate_ate(analysis_data,
+                               outcome_field = outcome_field,
+                               treatment_field = treatment_field,
+                               id_field = id_field,
+                               verbose = verbose)
     
-    # Temporary placeholder.
-    tmle_result = list(ate_est = 0, ci_left = 0, ci_right = 0,
-                       ipo_df = data.frame())
-    
+    # Put estimates into a list for rbinding into a dataframe.
     ate_result =
       list(ufid = ufid,
            # Population ATE.
