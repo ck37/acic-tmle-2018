@@ -1,12 +1,13 @@
 #' TODO: document function
-run_analysis = function(
-  input_dir_counterfactuals = "data-raw/practice-censoring",
-  # Inputs are all *.csvs that don't end in _cf.csv
-  # This is a regex with a negative lookbehind.
-  input_pattern = "(?<!_cf)\\.csv$",
-  input_cf_pattern = "_cf.csv$",
-  input_file_covariates = "data-raw/x.csv",
-  verbose = TRUE) {
+run_analysis =
+  function(
+    input_dir_counterfactuals = "data-raw/practice-censoring",
+    # Inputs are all *.csvs that don't end in _cf.csv
+    # This is a regex with a negative lookbehind.
+    input_pattern = "(?<!_cf)\\.csv$",
+    input_cf_pattern = "_cf.csv$",
+    input_file_covariates = "data-raw/x.csv",
+    verbose = TRUE) {
   
   # Check that input_dir_counterfactuals exists
   if (!dir.exists(input_dir_counterfactuals)) {
@@ -37,11 +38,17 @@ run_analysis = function(
   # Import covariate dataset
   covariates = rio::import(input_file_covariates)
   
+  # Process covariate file. Should return a list with at least $covariates and $id.
+  results = process_covariates(covariates, verbose = verbose)
+  covariates = results$covariates
+  id = results$id
+  
   # Looping over all counterfactual files
-  # Data setup
-  # Import one counterfactual file
-  # Merge counterfactuals with the covariate dataset based on sample_ID
-  # Run TMLE analysis
+  for (file in files) {
+    # Import one counterfactual file
+    # Merge counterfactuals with the covariate dataset based on sample_ID
+    # Run TMLE analysis
+  }
   
   # Return results
   # - ATE, CI
