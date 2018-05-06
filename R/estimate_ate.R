@@ -18,8 +18,7 @@ estimate_ate =
   covariate_df = data[, setdiff(colnames(data),
                                 c(outcome_field, treatment_field, id_field)), drop = FALSE]
   
-  # TODO: run TMLE
-    
+  # TODO: run TMLE, using outcome_vec (Y), treatment_vec (A), and covariate_df (W).
     
   # Compile results.
   results =
