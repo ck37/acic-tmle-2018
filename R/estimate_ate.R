@@ -18,6 +18,13 @@ estimate_ate =
   covariate_df = data[, setdiff(colnames(data),
                                 c(outcome_field, treatment_field, id_field)), drop = FALSE]
   
+  # Preprocess covariate data before running TMLE. Remove constant columns, etc.
+  covar_result = clean_data_tmle(covars_df = covariate_df,
+                                 outcome_vec = outcome_vec,
+                                 treatment_vec = treatment_vec,
+                                 verbose = verbose)
+  covariate_df = covar_result$covariate_df
+  
   # TODO: run TMLE, using outcome_vec (Y), treatment_vec (A), and covariate_df (W).
     
   # Compile results.
