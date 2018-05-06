@@ -61,6 +61,8 @@ outFile1 <- args[[2]]
 # outfile2 should be for individual treatment effects.
 outFile2 <- args[[3]]
 
+# run_tmle(input_file = inFile, output_file
+
 if (!file.exists(inFile)) stop("Cannot find '", inFile, "'")
 
 d <- read.csv(inFile)
