@@ -34,6 +34,11 @@ results =
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
     verbose = TRUE)
+# Now we have:
+# $ate - dataframe of ate estimates
+# $ipos - list with individual potential outcome estimates for each file.
+# $cf_files - vector of files to use for evaluating our estimates. 
+names(results)
 ```
 
 ## Evaluate estimates
@@ -41,6 +46,7 @@ results =
 If we have counterfactual files.
 
 ```{r eval_estimates}
+evaluate_estimates(results, verbose = TRUE)
 ```
 
 ## Create output files
