@@ -73,7 +73,7 @@ run_analysis =
     # Should return population ATE with inference, plus df of individual potential outcomes.
     
     # Temporary placeholder.
-    tmle_result = list(ate_est = NULL, ci_left = NULL, ci_right = NULL,
+    tmle_result = list(ate_est = 0, ci_left = 0, ci_right = 0,
                        ipo_df = data.frame())
     
     ate_result =
@@ -86,7 +86,7 @@ run_analysis =
            ri = tmle_result$ci_right)
     
     # Integrate into dataframe for the ATEs.
-    ate_df = rbind(ate_df, ate_result)
+    ate_df = rbind.data.frame(ate_df, ate_result, stringsAsFactors = FALSE)
     
     # Save individual potential outcome result.
     ipo_list[[ufid]] = tmle_result$ipo_df
