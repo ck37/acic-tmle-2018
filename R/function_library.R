@@ -120,6 +120,7 @@ attr(startup, "packages_github") = c(
   "ecpolley/SuperLearner",
   "tlverse/sl3",
   "ck37/ck37r",
-  #"osofr/stremr"
-  "jeremyrcoyle/gentmle2"
+  "jeremyrcoyle/gentmle2",
+  "vdorie/dbarts",
+  "swager/grf"
 )
