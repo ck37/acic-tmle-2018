@@ -8,8 +8,8 @@ revere.cvtmle = function(data,covariates_Q, covariates_c = NULL, covariates_g, l
                          metalearner_eval_Q, metalearner_eval_c = NULL, 
                          metalearner_eval_g = NULL)
 {  
-  if (is.null(metalearner_c)) metalearner_c = metalearnerQ
-  if (is.null(metalearner_g)) metalearner_g = metalearnerQ
+  if (is.null(metalearner_c)) metalearner_c = metalearner_Q
+  if (is.null(metalearner_g)) metalearner_g = metalearner_Q
   if (is.null(metalearner_eval_c)) metalearner_eval_c = metalearner_eval_Q
   if (is.null(metalearner_eval_g)) metalearner_eval_g = metalearner_eval_Q
   
