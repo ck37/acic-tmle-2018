@@ -102,6 +102,7 @@ attr(startup, "packages_cran") = c(
   "doParallel",
   "stargazer",
   "RhpcBLASctl",
+  "rio",
   
   # Visualization
   "ggplot2",
@@ -118,7 +119,7 @@ attr(startup, "packages_cran") = c(
 attr(startup, "packages_github") = c(
   "ecpolley/SuperLearner",
   "tlverse/sl3",
-  "ck37/ck37r"#,
+  "ck37/ck37r",
   #"osofr/stremr"
-  # TODO: add gentmle2
+  "jeremyrcoyle/gentmle2"
 )
