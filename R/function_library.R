@@ -102,6 +102,7 @@ attr(startup, "packages_cran") = c(
   "doParallel",
   "stargazer",
   "RhpcBLASctl",
+  "rio",
   
   # Visualization
   "ggplot2",
