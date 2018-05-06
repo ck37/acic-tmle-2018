@@ -47,7 +47,8 @@ Evaluate our estimates if we have counterfactual files.
 
 ```{r eval_estimates}
 if (exists("results") && "cf_files" %in% names(results) && length(results$cf_files) > 0L) {
-  evaluate_estimates(results, verbose = TRUE)
+  stats = evaluate_estimates(results, verbose = TRUE)
+  print(stats)
 }
 ```
 

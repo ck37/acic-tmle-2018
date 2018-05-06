@@ -42,6 +42,11 @@ evaluate_estimates = function(results, verbose = FALSE) {
     stats = rbind.data.frame(stats, result, stringsAsFactors = FALSE)
   }
   
+  if (verbose) {
+    cat("Coverage:", paste0(round(mean(stats$ci_covers_true_ate) * 100, 1), "%"),
+        "Average MSE:", round(mean(stats$mse), 3), "\n")
+  }
+  
   # Compile and return results.
   # TODO: possibly return more info.
   return(stats)
