@@ -15,7 +15,7 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   
   if (is.null(lrnr_stack_c)) lrnr_stack_c = lrnr_stack_Q 
   if(is.null(lrnr_stack_g)) lrnr_stack_g = lrnr_stack_Q 
-  if (is.null(covariates_c)) covariates_c = covariates_Q
+  if (is.null(covariates_c)) covariates_c = covariates_g
   
   cv_lrnr_Q = Lrnr_cv$new(lrnr_stack_Q)
   cv_lrnr_c = Lrnr_cv$new(lrnr_stack_c)
