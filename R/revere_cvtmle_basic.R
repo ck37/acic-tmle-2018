@@ -149,7 +149,7 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
                fluctuation = "logistic")
   
   # grab the definitive epsilon
-  eps = tmle1$eps
+  # eps = tmle1$eps
   
   preds_star = tmle_info$Qstar[,1]*(1-z) + tmle_info$Qstar[,2]*z
   CATE_star = tmle_info$Qstar[,2] - tmle_info$Qstar[,1]
