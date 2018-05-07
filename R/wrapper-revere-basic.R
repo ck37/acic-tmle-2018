@@ -48,6 +48,8 @@ wrapper_revere_basic =
                          treatment_field = treatment_field,
                          covariates_Q = covariates_Q, 
                          covariates_g = covariates_g,
+                         # The Q stack will be re-used for g by default.
+                         # Otherwise define lrnr_stack_g
                          lrnr_stack_Q = lrnr_stack_Q,
                          metalearner_Q = metalearner_Q, 
                          metalearner_eval_Q = metalearner_eval_Q,
