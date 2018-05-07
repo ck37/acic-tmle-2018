@@ -22,6 +22,10 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   cv_lrnr_g = Lrnr_cv$new(lrnr_stack_g)
   
   n = nrow(data) 
+  data$C = as.numeric(is.na(data$y))
+  
+  # this is to not mess up sl3 with its outcome type
+  data$y[is.na(data$y)] = 1
   
   # create the censoring strata to balance--this is optional but might be helpful in 
   # the make folds below
@@ -37,21 +41,21 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
                                     use_future=FALSE)$fold
   
   # make the task to train Qbar on uncensored data
-  QAW_task_sub = make_sl3_Task(data = data, covariates = covariates_Q, outcome = "Y",
+  QAW_task_sub = make_sl3_Task(data = data, covariates = covariates_Q, outcome = "y",
                                folds = subsetted_folds)
   
   # We predict on the whole stacked validation sets (this task) because we can
-  QAW_task = make_sl3_Task(data = data, covariates = covariates_Q, outcome = "Y",
+  QAW_task = make_sl3_Task(data = data, covariates = covariates_Q, outcome = "y",
                            folds = folds)
   
   # make tasks for the A=1 and A=0 subsets for prediction
   dataQ1W = dataQ0W = data
-  dataQ1W$A = 1
-  dataQ0W$A = 0
+  dataQ1W$z = 1
+  dataQ0W$z = 0
   
-  Q1W_task = make_sl3_Task(data = dataQ1W, covariates = covariates_Q, outcome = "Y",
+  Q1W_task = make_sl3_Task(data = dataQ1W, covariates = covariates_Q, outcome = "y",
                            folds = folds)
-  Q0W_task = make_sl3_Task(data = dataQ0W, covariates = covariates_Q, outcome = "Y",
+  Q0W_task = make_sl3_Task(data = dataQ0W, covariates = covariates_Q, outcome = "y",
                            folds = folds)
   
   # train Qbar on the folds using uncensored 
@@ -64,14 +68,15 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   inds = unlist(lapply(folds, FUN = function(x) x$validation_set))
   subsetted_inds = unlist(lapply(subsetted_folds, FUN = function(x) x$validation_set))
   
-  Y = data$Y
+  
+  y = data$y
   C = data$C
-  A = data$A
-  Y_sub = Y[subset_index]
+  z = data$z
+  y_sub = y[subset_index]
   
   # fit the metalearner and get coefs to be used later
-  Z_Q = make_sl3_Task(data = cbind(Y = Y_sub, QAW_stack_sub), 
-                      covariates = names(QAW_stack_sub), outcome = "Y")
+  Z_Q = make_sl3_Task(data = cbind(y = y_sub, QAW_stack_sub), 
+                      covariates = names(QAW_stack_sub), outcome = "y")
   Qfit = metalearner_Q$train(Z_Q)
   coefQ = Qfit$coefficients
   
@@ -81,12 +86,12 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   Q0W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q0W_task)))
   
   # setting censored outcomes to NA because that's how they should be coded in reality'
-  Y[C==1] = NA
+  y[C==1] = NA
   
   # fit and predict on folds for g and c
   
   #first fit the pscores
-  g1W_task = make_sl3_Task(data = data, covariates = covariates_g, outcome = "A",
+  g1W_task = make_sl3_Task(data = data, covariates = covariates_g, outcome = "z",
                            folds = folds)
   
   # fit on training folds
@@ -96,8 +101,8 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   g1W_stack = cv_lrnr_fitg$predict()
   
   # fit the metalearner
-  Z_g = make_sl3_Task(data = cbind(A = A, g1W_stack), 
-                      covariates = names(g1W_stack), outcome = "A")
+  Z_g = make_sl3_Task(data = cbind(z = z, g1W_stack), 
+                      covariates = names(g1W_stack), outcome = "z")
   gfit = metalearner_g$train(Z_g)
   coefg = gfit$coefficients
   
@@ -136,16 +141,19 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   # feeding into susan's package to target only--very fast
   pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
   Q = matrix(c(Q0W, Q1W), ncol = 2)
-  W = data[,3:6]
-  tmle_info = tmle(Y=Y,A=A,W=W, Delta = 1-C,Q = Q, pDelta1 = pDelta1, g1W = g1W, family = 'binomial',
+  
+  # jury-rigging because data.table is obtuse to a moron non-programmer
+  data = as.data.frame(data)
+  W = data[,covariates_Q]
+  tmle_info = tmle(Y=y,A=z,W=W, Delta = 1-C,Q = Q, pDelta1 = pDelta1, g1W = g1W, family = 'binomial',
                fluctuation = "logistic")
   
   # grab the definitive epsilon
   eps = tmle1$eps
   
-  preds_star = tmle_info[,1]*(1-A) + tmle_info[,2]*A
+  preds_star = tmle_info[,1]*(1-z) + tmle_info[,2]*z
   CATE_star = tmle_info[,2] - tmle_info[,1]
-  preds_init = Q[,1]*(1-A) + Q[,2]*A
+  preds_init = Q[,1]*(1-z) + Q[,2]*z
   CATE_init = Q[,2] - Q[,1]
   
   CI = c(tmle_info$estimates$ATE$psi,tmle_info$estimates$ATE$CI)
