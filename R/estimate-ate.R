@@ -51,6 +51,7 @@ estimate_ate =
                           list(data = data,
                                outcome_field = outcome_field,
                                treatment_field = treatment_field,
+                               id_field = id_field,
                                verbose = verbose))
     results =
       list(ate_est = tmle_result$ate_est,

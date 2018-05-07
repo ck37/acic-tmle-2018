@@ -1,8 +1,9 @@
 # This will setup the SuperLearner stuff, call the basic revere, then send results back to estimate_ate.R
 wrapper_revere_basic =
   function(data,
-           outcome_field,
-           treatment_field,
+           outcome_field = "y",
+           treatment_field = "z",
+           id_field = NULL,
            covariate_fields = NULL,
            verbose = FALSE) {
   # This function name would be passed into run_analyis() and would be
@@ -11,8 +12,10 @@ wrapper_revere_basic =
     cat("Running wrapper_revere_basic().\n")
   }
     
-  # TODO: define all the required elements to pass into reverse_cvtmle_basic
+  ##############
+  # Define all the required elements to pass into revere_cvtmle_basic
   # This is based on revere_cvtmle_example.R
+    
   lrnr_mean = make_learner(Lrnr_mean)
   lrnr_glm = make_learner(Lrnr_glm)
   # Only exists in Jonathan's fork of sl3 - can't use this yet.
@@ -30,7 +33,8 @@ wrapper_revere_basic =
   metalearner_Q = make_learner(Lrnr_nnls)
   
   if (is.null(covariate_fields)) {
-    covariate_fields = setdiff(colnames(data), c(outcome_field, treatment_field))
+    covariate_fields = setdiff(colnames(data),
+                               c(outcome_field, treatment_field, id_field))
   }
   
   # Include treatment indicator in outcome regression.
@@ -50,6 +54,7 @@ wrapper_revere_basic =
                          verbose = verbose)
   
   # TODO: Create potential outcomes dataframe out of the preds_all dataframe.
+  # Which columns should we use for y0 and y1?
   potential_outcomes_df = data.frame()
   
   # Compile results.  
