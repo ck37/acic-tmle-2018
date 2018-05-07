@@ -10,6 +10,7 @@ run_analysis =
     id_field = "sample_id",
     outcome_field = "y",
     treatment_field = "z",
+    tmle_wrapper = NULL,
     verbose = TRUE) {
   
   # Check that input_dir_counterfactuals exists
@@ -83,6 +84,7 @@ run_analysis =
                                outcome_field = outcome_field,
                                treatment_field = treatment_field,
                                id_field = id_field,
+                               tmle_wrapper = tmle_wrapper,
                                verbose = verbose)
     
     # Put estimates into a list for rbinding into a dataframe.

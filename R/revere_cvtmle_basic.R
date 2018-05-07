@@ -19,7 +19,8 @@ revere_cvtmle_basic =
            metalearner_g = NULL,
            metalearner_eval_Q,
            metalearner_eval_c = NULL, 
-           metalearner_eval_g = NULL) {  
+           metalearner_eval_g = NULL,
+           verbose = FALSE) {  
     
   if (is.null(metalearner_c)) metalearner_c = metalearner_Q
   if (is.null(metalearner_g)) metalearner_g = metalearner_Q
@@ -173,6 +174,8 @@ revere_cvtmle_basic =
   # jury-rigging because data.table is obtuse to a moron non-programmer
   data = as.data.frame(data)
   W = data[, covariates_Q, drop = FALSE]
+  
+  # Confirm length of z is equal to nrow of Q.
   
   # feeding into susan's package (tmle) to target only--very fast
   tmle_info = tmle(Y = y,
