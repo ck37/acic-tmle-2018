@@ -78,9 +78,11 @@ run_analysis =
     # Run TMLE analysis.
     # TODO: determine function to run; pass in appropriate data.
     # Should return population ATE with inference, plus df of individual potential outcomes.
+    # input the rest of the stuff from the function revere_cvtmle_basic.  data can be the data
+    # as merged with z as treatment, y as oc..  
     tmle_result = estimate_ate(analysis_data,
-                               outcome_field = outcome_field,
-                               treatment_field = treatment_field,
+                               # outcome_field = outcome_field,
+                               # treatment_field = treatment_field,
                                id_field = id_field,
                                verbose = verbose)
     
