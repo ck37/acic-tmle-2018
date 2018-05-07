@@ -194,14 +194,21 @@ revere_cvtmle_basic =
   
   CI = c(tmle_info$estimates$ATE$psi, tmle_info$estimates$ATE$CI)
   
+  # Compile individual predictions.
   preds_all = data.frame(preds_star = preds_star,
                          CATE_star = CATE_star,
                          preds_init = preds_init,
                          CATE_init = CATE_init)
   
-  res = list(preds_all = preds_all, CI = CI)
+  # Compile results.
+  results =
+    list(preds_all = preds_all,
+         ate_est = tmle_info$estimates$ATE$psi,
+         conf_int = tmle_info$estimates$ATE$CI,
+         epsilon = eps,
+         CI = CI)
   
-  return(res)
+  return(results)
 }
 
 
