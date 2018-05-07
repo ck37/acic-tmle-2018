@@ -27,13 +27,13 @@ run_analysis =
     cat("Found", length(files), "files to process.\n")
   }
   
-  # The _cf.csv files are for checking our predictions
+  # The _cf.csv files are for evaluating our estimates at the population & individual levels.
   cf_files = all_files[grepl(input_cf_pattern, all_files, perl = TRUE)]
   if (verbose) {
     cat("Found", length(cf_files), "true counterfactual files for evaluation.\n")
   }
   
-  # Check that input_file_covariates exists
+  # Check that input_file_covariates exists.
   if (!file.exists(input_file_covariates)) {
     stop(paste("Counterfactual directory not found:", input_file_covariates))
   }
@@ -42,6 +42,7 @@ run_analysis =
   covariate_df = rio::import(input_file_covariates)
   
   # Process covariate file. Should return a list with at least $covariates and $id.
+  # This function is defined in R/process-covariates.R
   results = process_covariates(covariate_df, verbose = verbose)
   covariate_df = results$data
   id = results$id
