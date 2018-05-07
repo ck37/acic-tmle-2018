@@ -6,6 +6,7 @@ estimate_ate =
            outcome_field = "Y",
            treatment_field = "A",
            id_field = "id",
+           prescreen=TRUE,
            verbose = FALSE) {
     
   # Extract outcome variable
@@ -32,6 +33,7 @@ estimate_ate =
   covar_result = clean_data_tmle(covars_df = covariate_df,
                                  outcome_vec = outcome_vec,
                                  treatment_vec = treatment_vec,
+                                 prescreen=prescreen,
                                  verbose = verbose)
   covariate_df = covar_result$covariate_df
   

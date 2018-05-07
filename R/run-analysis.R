@@ -11,6 +11,7 @@ run_analysis =
     outcome_field = "y",
     treatment_field = "z",
     tmle_wrapper = NULL,
+    prescreen=TRUE,
     verbose = TRUE) {
   
   # Check that input_dir_counterfactuals exists
@@ -48,7 +49,6 @@ run_analysis =
   covariate_df = results$data
   id = results$id
   
-  
   # Dataframe to save ATE estimates for each file.
   ate_df = NULL
   # List of individual potential outcome estimates for each file.
@@ -85,6 +85,7 @@ run_analysis =
                                treatment_field = treatment_field,
                                id_field = id_field,
                                tmle_wrapper = tmle_wrapper,
+                               prescreen=prescreen,
                                verbose = verbose)
     
     # Put estimates into a list for rbinding into a dataframe.
