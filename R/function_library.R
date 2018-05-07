@@ -48,7 +48,7 @@ load_all_packages =
       if (is.null(names(packages_github))) {
         # Extract package name as the repo name of each package, if the vector itself is not named.
         # This assumes github packages are of the form: username/repo@whatev (@whatev optionally included).
-        github_names = gsub("^[^/]+/([^@]+)", "\\1", packages_github)
+        github_names = gsub("^[^/]+/([^@]+).*$", "\\1", packages_github)
       } else {
         # Support a named vector, in case the package name is not the same as the repo name.
         github_names = names(packages_github)
