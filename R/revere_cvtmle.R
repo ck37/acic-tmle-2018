@@ -67,7 +67,7 @@ revere.cvtmle = function(data,covariates_Q, covariates_c = NULL, covariates_g, l
   Y = data$Y
   C = data$C
   A = data$A
-  Y_sub = data$Y[order(subsetted_inds)]
+  Y_sub = data$Y[subset_index]
   
   # fit the metalearner and get coefs to be used later
   Z_Q = make_sl3_Task(data = cbind(Y = Y_sub, QAW_stack_sub), 
