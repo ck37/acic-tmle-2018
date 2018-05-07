@@ -36,7 +36,7 @@ revere_cvtmle_basic =
   cv_lrnr_g = Lrnr_cv$new(lrnr_stack_g)
   
   n = nrow(data) 
-  data[[censor_field]] = as.numeric(is.na(data[[outcome_field]]))
+  data[[censor_field]] = as.integer(is.na(data[[outcome_field]]))
   
   # this is to not mess up sl3 with its outcome type
   data[[outcome_field]][is.na(data[[outcome_field]])] = 1
@@ -176,6 +176,7 @@ revere_cvtmle_basic =
   W = data[, covariates_Q, drop = FALSE]
   
   # Confirm length of z is equal to nrow of Q.
+  # stopifnot(length(z) == nrow(Q))
   
   # feeding into susan's package (tmle) to target only--very fast
   tmle_info = tmle(Y = y,
@@ -185,7 +186,7 @@ revere_cvtmle_basic =
                    Q = Q,
                    pDelta1 = pDelta1,
                    g1W = g1W,
-                   family = 'binomial',
+                   family = "binomial",
                    fluctuation = "logistic")
   
   # grab the definitive epsilon
