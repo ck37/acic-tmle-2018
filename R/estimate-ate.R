@@ -26,6 +26,8 @@ estimate_ate =
   covariate_df = covar_result$covariate_df
   
   # TODO: run TMLE, using outcome_vec (Y), treatment_vec (A), and covariate_df (W).
+  # input the rest of the stuff from the function revere_cvtmle_basic.  data can be the data
+  # as merged with z as treatment, y as oc..  
     
   # Compile results.
   results =

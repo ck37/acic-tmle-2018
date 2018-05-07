@@ -32,6 +32,7 @@ evaluate_estimates = function(results, verbose = FALSE) {
     # TODO: process individual potential outcome estimates.
     
     # Evaluate MSE on the individual potential outcomes.
+    
     # Save result.
     result =
       list(ufid = ufid,
