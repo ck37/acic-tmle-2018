@@ -6,11 +6,17 @@ estimate_ate =
            verbose = FALSE) {
     
   # Extract outcome variable
-  # TODO: check if outcome_field actually exists.
+  if (!outcome_field %in% names(data)) {
+    stop(paste("Outcome not found:", names(data)))
+  }  
+ 
   outcome_vec = data[[outcome_field]]
   
   # Extract treatment variable.
-  # TODO: check if treatment_field actually exists.
+  if (!treatment_field %in% names(data)) {
+    stop(paste("Treatment not found:", names(data)))
+  }
+  
   treatment_vec = data[[treatment_field]]
     
   # Extract covariates - all remaining variables.
