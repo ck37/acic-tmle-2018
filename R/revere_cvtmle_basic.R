@@ -46,11 +46,11 @@ revere_cvtmle_basic =
   strata_ids[data[[censor_field]] == 0] = "C0"
   
   # make the balanced folds as per censoring
-  folds <- make_folds(n, strata_ids = strata_ids)
+  folds <- origami::make_folds(n, strata_ids = strata_ids)
   
   # subset index the folds because we can only fit on uncensored
   subset_index <- which(data[[censor_field]] == 0)
-  subsetted_folds <- cross_validate(subset_fold_training, folds, subset_index, 
+  subsetted_folds <- origami::cross_validate(subset_fold_training, folds, subset_index, 
                                     use_future = FALSE)$fold
   
   # make the task to train Qbar on uncensored data
@@ -185,7 +185,7 @@ revere_cvtmle_basic =
                    fluctuation = "logistic")
   
   # grab the definitive epsilon
-  eps = tmle1$eps
+  eps = tmle_info$eps
   
   preds_star = tmle_info$Qstar[,1]*(1-z) + tmle_info$Qstar[,2]*z
   CATE_star = tmle_info$Qstar[,2] - tmle_info$Qstar[,1]
