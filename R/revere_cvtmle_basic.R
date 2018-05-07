@@ -27,7 +27,7 @@ revere_cvtmle_basic =
   if (is.null(metalearner_eval_g)) metalearner_eval_g = metalearner_eval_Q
   
   if (is.null(lrnr_stack_c)) lrnr_stack_c = lrnr_stack_Q 
-  if(is.null(lrnr_stack_g)) lrnr_stack_g = lrnr_stack_Q 
+  if (is.null(lrnr_stack_g)) lrnr_stack_g = lrnr_stack_Q 
   if (is.null(covariates_c)) covariates_c = covariates_g
   
   cv_lrnr_Q = Lrnr_cv$new(lrnr_stack_Q)
@@ -51,15 +51,17 @@ revere_cvtmle_basic =
   # subset index the folds because we can only fit on uncensored
   subset_index <- which(data[[censor_field]] == 0)
   subsetted_folds <- cross_validate(subset_fold_training, folds, subset_index, 
-                                    use_future=FALSE)$fold
+                                    use_future = FALSE)$fold
   
   # make the task to train Qbar on uncensored data
-  QAW_task_sub = make_sl3_Task(data = data, covariates = covariates_Q,
+  QAW_task_sub = make_sl3_Task(data = data,
+                               covariates = covariates_Q,
                                outcome = outcome_field,
                                folds = subsetted_folds)
   
   # We predict on the whole stacked validation sets (this task) because we can
-  QAW_task = make_sl3_Task(data = data, covariates = covariates_Q,
+  QAW_task = make_sl3_Task(data = data,
+                           covariates = covariates_Q,
                            outcome = outcome_field,
                            folds = folds)
   
@@ -68,10 +70,12 @@ revere_cvtmle_basic =
   dataQ1W$z = 1
   dataQ0W$z = 0
   
-  Q1W_task = make_sl3_Task(data = dataQ1W, covariates = covariates_Q,
+  Q1W_task = make_sl3_Task(data = dataQ1W,
+                           covariates = covariates_Q,
                            outcome = outcome_field,
                            folds = folds)
-  Q0W_task = make_sl3_Task(data = dataQ0W, covariates = covariates_Q,
+  Q0W_task = make_sl3_Task(data = dataQ0W,
+                           covariates = covariates_Q,
                            outcome = outcome_field,
                            folds = folds)
   
@@ -157,7 +161,7 @@ revere_cvtmle_basic =
                       covariates = names(c1W_stack),
                       outcome = censor_field)
   cfit = metalearner_c$train(Z_c)
-  coefc= cfit$coefficients
+  coefc = cfit$coefficients
   
   # 1 minus to get probability of being observed for both A=1 and A=0 obs
   c1W_A1 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA1))
@@ -169,9 +173,16 @@ revere_cvtmle_basic =
   
   # jury-rigging because data.table is obtuse to a moron non-programmer
   data = as.data.frame(data)
-  W = data[,covariates_Q]
-  tmle_info = tmle(Y=y,A=z,W=W, Delta = 1-C,Q = Q, pDelta1 = pDelta1, g1W = g1W, family = 'binomial',
-               fluctuation = "logistic")
+  W = data[, covariates_Q]
+  tmle_info = tmle(Y = y,
+                   A = z,
+                   W = W,
+                   Delta = 1 - C,
+                   Q = Q,
+                   pDelta1 = pDelta1,
+                   g1W = g1W,
+                   family = 'binomial',
+                   fluctuation = "logistic")
   
   # grab the definitive epsilon
   eps = tmle1$eps
@@ -181,10 +192,13 @@ revere_cvtmle_basic =
   preds_init = tmle_info$Qinit$Q[,1]*(1-z) + tmle_info$Qinit$Q[,2]*z
   CATE_init = tmle_info$Qinit$Q[,2] - tmle_info$Qinit$Q[,1]
   
-  CI = c(tmle_info$estimates$ATE$psi,tmle_info$estimates$ATE$CI)
+  CI = c(tmle_info$estimates$ATE$psi, tmle_info$estimates$ATE$CI)
   
-  preds_all = data.frame(preds_star = preds_star, CATE_star = CATE_star, preds_init = preds_init,
-                   CATE_init = CATE_init)
+  preds_all = data.frame(preds_star = preds_star,
+                         CATE_star = CATE_star,
+                         preds_init = preds_init,
+                         CATE_init = CATE_init)
+  
   res = list(preds_all = preds_all, CI = CI)
   
   return(res)
