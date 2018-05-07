@@ -67,8 +67,8 @@ revere_cvtmle_basic =
   
   # make tasks for the A=1 and A=0 subsets for prediction
   dataQ1W = dataQ0W = data
-  dataQ1W$z = 1
-  dataQ0W$z = 0
+  dataQ1W[[treatment_field]] = 1
+  dataQ0W[[treatment_field]] = 0
   
   Q1W_task = make_sl3_Task(data = dataQ1W,
                            covariates = covariates_Q,
@@ -167,13 +167,14 @@ revere_cvtmle_basic =
   c1W_A1 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA1))
   c1W_A0 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA0))
   
-  # feeding into susan's package to target only--very fast
   pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
   Q = matrix(c(Q0W, Q1W), ncol = 2)
   
   # jury-rigging because data.table is obtuse to a moron non-programmer
   data = as.data.frame(data)
-  W = data[, covariates_Q]
+  W = data[, covariates_Q, drop = FALSE]
+  
+  # feeding into susan's package (tmle) to target only--very fast
   tmle_info = tmle(Y = y,
                    A = z,
                    W = W,
