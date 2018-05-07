@@ -190,7 +190,7 @@ revere_cvtmle_basic =
                    fluctuation = "logistic")
   
   # grab the definitive epsilon
-  eps = tmle_info$eps
+
   
   preds_star = tmle_info$Qstar[,1]*(1-z) + tmle_info$Qstar[,2]*z
   CATE_star = tmle_info$Qstar[,2] - tmle_info$Qstar[,1]
