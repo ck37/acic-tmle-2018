@@ -2,12 +2,25 @@
 # revere, which does not solve the IC equation but comes from a model which does 
 # and is slightly more efficient
 
-revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariates_g, lrnr_stack_Q,
-                         lrnr_stack_c = NULL, lrnr_stack_g = NULL, metalearner_Q, 
-                         metalearner_c = NULL, metalearner_g = NULL,
-                         metalearner_eval_Q, metalearner_eval_c = NULL, 
-                         metalearner_eval_g = NULL)
-{  
+revere_cvtmle_basic =
+  function(data,
+           outcome_field = "y",
+           treatment_field = "z",
+           id_field = "sample_id",
+           censor_field = "C",
+           covariates_Q,
+           covariates_c = NULL,
+           covariates_g,
+           lrnr_stack_Q,
+           lrnr_stack_c = NULL,
+           lrnr_stack_g = NULL,
+           metalearner_Q, 
+           metalearner_c = NULL,
+           metalearner_g = NULL,
+           metalearner_eval_Q,
+           metalearner_eval_c = NULL, 
+           metalearner_eval_g = NULL) {  
+    
   if (is.null(metalearner_c)) metalearner_c = metalearner_Q
   if (is.null(metalearner_g)) metalearner_g = metalearner_Q
   if (is.null(metalearner_eval_c)) metalearner_eval_c = metalearner_eval_Q
@@ -22,30 +35,32 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   cv_lrnr_g = Lrnr_cv$new(lrnr_stack_g)
   
   n = nrow(data) 
-  data$C = as.numeric(is.na(data$y))
+  data[[censor_field]] = as.numeric(is.na(data[[outcome_field]]))
   
   # this is to not mess up sl3 with its outcome type
-  data$y[is.na(data$y)] = 1
+  data[[outcome_field]][is.na(data[[outcome_field]])] = 1
   
   # create the censoring strata to balance--this is optional but might be helpful in 
   # the make folds below
   strata_ids = rep("C1", n)
-  strata_ids[data$C==0] = "C0"
+  strata_ids[data[[censor_field]] == 0] = "C0"
   
   # make the balanced folds as per censoring
   folds <- make_folds(n, strata_ids = strata_ids)
   
   # subset index the folds because we can only fit on uncensored
-  subset_index <- which(data$C == 0)
+  subset_index <- which(data[[censor_field]] == 0)
   subsetted_folds <- cross_validate(subset_fold_training, folds, subset_index, 
                                     use_future=FALSE)$fold
   
   # make the task to train Qbar on uncensored data
-  QAW_task_sub = make_sl3_Task(data = data, covariates = covariates_Q, outcome = "y",
+  QAW_task_sub = make_sl3_Task(data = data, covariates = covariates_Q,
+                               outcome = outcome_field,
                                folds = subsetted_folds)
   
   # We predict on the whole stacked validation sets (this task) because we can
-  QAW_task = make_sl3_Task(data = data, covariates = covariates_Q, outcome = "y",
+  QAW_task = make_sl3_Task(data = data, covariates = covariates_Q,
+                           outcome = outcome_field,
                            folds = folds)
   
   # make tasks for the A=1 and A=0 subsets for prediction
@@ -53,9 +68,11 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   dataQ1W$z = 1
   dataQ0W$z = 0
   
-  Q1W_task = make_sl3_Task(data = dataQ1W, covariates = covariates_Q, outcome = "y",
+  Q1W_task = make_sl3_Task(data = dataQ1W, covariates = covariates_Q,
+                           outcome = outcome_field,
                            folds = folds)
-  Q0W_task = make_sl3_Task(data = dataQ0W, covariates = covariates_Q, outcome = "y",
+  Q0W_task = make_sl3_Task(data = dataQ0W, covariates = covariates_Q,
+                           outcome = outcome_field,
                            folds = folds)
   
   # train Qbar on the folds using uncensored 
@@ -69,14 +86,15 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   subsetted_inds = unlist(lapply(subsetted_folds, FUN = function(x) x$validation_set))
   
   
-  y = data$y
-  C = data$C
-  z = data$z
+  y = data[[outcome_field]]
+  C = data[[censor_field]]
+  z = data[[treatment_field]]
   y_sub = y[subset_index]
   
   # fit the metalearner and get coefs to be used later
   Z_Q = make_sl3_Task(data = cbind(y = y_sub, QAW_stack_sub), 
-                      covariates = names(QAW_stack_sub), outcome = "y")
+                      covariates = names(QAW_stack_sub),
+                      outcome = outcome_field)
   Qfit = metalearner_Q$train(Z_Q)
   coefQ = Qfit$coefficients
   
@@ -86,12 +104,14 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   Q0W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q0W_task)))
   
   # setting censored outcomes to NA because that's how they should be coded in reality'
-  y[C==1] = NA
+  y[C == 1] = NA
   
   # fit and predict on folds for g and c
   
   #first fit the pscores
-  g1W_task = make_sl3_Task(data = data, covariates = covariates_g, outcome = "z",
+  g1W_task = make_sl3_Task(data = data,
+                           covariates = covariates_g,
+                           outcome = treatment_field,
                            folds = folds)
   
   # fit on training folds
@@ -102,7 +122,8 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   
   # fit the metalearner
   Z_g = make_sl3_Task(data = cbind(z = z, g1W_stack), 
-                      covariates = names(g1W_stack), outcome = "z")
+                      covariates = names(g1W_stack),
+                      outcome = treatment_field)
   gfit = metalearner_g$train(Z_g)
   coefg = gfit$coefficients
   
@@ -110,13 +131,16 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   g1W = metalearner_eval_g(coefg, as.matrix(g1W_stack))
   
   # fit on folds and predict on subsetted folds for g and c
-  c1W_task = make_sl3_Task(data = data, covariates = covariates_Q, outcome = "C",
+  c1W_task = make_sl3_Task(data = data, covariates = covariates_Q,
+                           outcome = censor_field,
                            folds = folds)
   
   # need to fit for A=1 and for A=0 so we make these tasks
-  c1W_taskA1 = make_sl3_Task(data = dataQ1W, covariates = covariates_Q, outcome = "C",
+  c1W_taskA1 = make_sl3_Task(data = dataQ1W, covariates = covariates_Q,
+                             outcome = censor_field,
                              folds = folds)
-  c1W_taskA0 = make_sl3_Task(data = dataQ0W, covariates = covariates_Q, outcome = "C",
+  c1W_taskA0 = make_sl3_Task(data = dataQ0W, covariates = covariates_Q,
+                             outcome = censor_field,
                              folds = folds)
   
   # fit on the training sets
@@ -130,7 +154,8 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   
   # fit the metalearner
   Z_c = make_sl3_Task(data = cbind(C = C, c1W_stack), 
-                      covariates = names(c1W_stack), outcome = "C")
+                      covariates = names(c1W_stack),
+                      outcome = censor_field)
   cfit = metalearner_c$train(Z_c)
   coefc= cfit$coefficients
   
