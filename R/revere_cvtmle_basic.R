@@ -151,10 +151,10 @@ revere_cvtmle_basic = function(data,covariates_Q, covariates_c = NULL, covariate
   # grab the definitive epsilon
   eps = tmle1$eps
   
-  preds_star = tmle_info[,1]*(1-z) + tmle_info[,2]*z
-  CATE_star = tmle_info[,2] - tmle_info[,1]
-  preds_init = Q[,1]*(1-z) + Q[,2]*z
-  CATE_init = Q[,2] - Q[,1]
+  preds_star = tmle_info$Qstar[,1]*(1-z) + tmle_info$Qstar[,2]*z
+  CATE_star = tmle_info$Qstar[,2] - tmle_info$Qstar[,1]
+  preds_init = tmle_info$Qinit$Q[,1]*(1-z) + tmle_info$Qinit$Q[,2]*z
+  CATE_init = tmle_info$Qinit$Q[,2] - tmle_info$Qinit$Q[,1]
   
   CI = c(tmle_info$estimates$ATE$psi,tmle_info$estimates$ATE$CI)
   
