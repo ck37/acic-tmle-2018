@@ -118,6 +118,7 @@ attr(startup, "packages_cran") = c(
 
 attr(startup, "packages_github") = c(
   "ecpolley/SuperLearner",
+  "tlverse/origami",
   # Make sure to install the devel branch of sl3, not master.
   "tlverse/sl3@devel",
   "ck37/ck37r",

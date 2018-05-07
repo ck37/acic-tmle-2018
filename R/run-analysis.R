@@ -10,6 +10,7 @@ run_analysis =
     id_field = "sample_id",
     outcome_field = "y",
     treatment_field = "z",
+    tmle_wrapper = NULL,
     verbose = TRUE) {
   
   # Check that input_dir_counterfactuals exists
@@ -27,13 +28,13 @@ run_analysis =
     cat("Found", length(files), "files to process.\n")
   }
   
-  # The _cf.csv files are for checking our predictions
+  # The _cf.csv files are for evaluating our estimates at the population & individual levels.
   cf_files = all_files[grepl(input_cf_pattern, all_files, perl = TRUE)]
   if (verbose) {
     cat("Found", length(cf_files), "true counterfactual files for evaluation.\n")
   }
   
-  # Check that input_file_covariates exists
+  # Check that input_file_covariates exists.
   if (!file.exists(input_file_covariates)) {
     stop(paste("Counterfactual directory not found:", input_file_covariates))
   }
@@ -42,6 +43,7 @@ run_analysis =
   covariate_df = rio::import(input_file_covariates)
   
   # Process covariate file. Should return a list with at least $covariates and $id.
+  # This function is defined in R/process-covariates.R
   results = process_covariates(covariate_df, verbose = verbose)
   covariate_df = results$data
   id = results$id
@@ -76,14 +78,13 @@ run_analysis =
     analysis_data[[id_field]] = NULL
     
     # Run TMLE analysis.
-    # TODO: determine function to run; pass in appropriate data.
     # Should return population ATE with inference, plus df of individual potential outcomes.
-    # input the rest of the stuff from the function revere_cvtmle_basic.  data can be the data
-    # as merged with z as treatment, y as oc..  
+    # This function is defined in R/estimate-ate.R
     tmle_result = estimate_ate(analysis_data,
-                               # outcome_field = outcome_field,
-                               # treatment_field = treatment_field,
+                               outcome_field = outcome_field,
+                               treatment_field = treatment_field,
                                id_field = id_field,
+                               tmle_wrapper = tmle_wrapper,
                                verbose = verbose)
     
     # Put estimates into a list for rbinding into a dataframe.
