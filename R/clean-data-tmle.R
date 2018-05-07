@@ -5,19 +5,6 @@ clean_data_tmle =
            prescreen,
            verbose = verbose) {
     
-  # Remove constant columns from the covariate file.
-  constant_columns = which(apply(covars_df, MARGIN = 2L, var) == 0)
-
-  if(length(constant_columns)>0){
-    covars_df = covars_df[, -constant_columns, drop = FALSE]
-  }
-    
-  if (verbose) {
-    cat("Removed", length(constant_columns), "constant columns from covariate file.\n")
-  }
-  
-  rm(constant_columns)
-  
   #Remove linearly correlated columns from the covariate file?
   linear_combos = caret::findLinearCombos(covars_df)
   remove_columns = linear_combos$remove
