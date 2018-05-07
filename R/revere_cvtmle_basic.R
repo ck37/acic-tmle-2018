@@ -191,7 +191,6 @@ revere_cvtmle_basic =
   
   # grab the definitive epsilon
 
-  
   preds_star = tmle_info$Qstar[,1]*(1-z) + tmle_info$Qstar[,2]*z
   CATE_star = tmle_info$Qstar[,2] - tmle_info$Qstar[,1]
   preds_init = tmle_info$Qinit$Q[,1]*(1-z) + tmle_info$Qinit$Q[,2]*z
@@ -210,7 +209,6 @@ revere_cvtmle_basic =
     list(preds_all = preds_all,
          ate_est = tmle_info$estimates$ATE$psi,
          conf_int = tmle_info$estimates$ATE$CI,
-         epsilon = eps,
          CI = CI)
   
   return(results)
