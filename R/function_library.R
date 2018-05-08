@@ -103,6 +103,7 @@ attr(startup, "packages_cran") = c(
   "stargazer",
   "RhpcBLASctl",
   "rio",
+  "uuid",
   
   # Visualization
   "ggplot2",
@@ -124,5 +125,6 @@ attr(startup, "packages_github") = c(
   "ck37/ck37r",
   "jeremyrcoyle/gentmle2",
   "vdorie/dbarts",
-  "swager/grf"
+  "swager/grf",
+  "jeremyrcoyle/delayed"
 )
