@@ -62,7 +62,8 @@ results_tmle =
   run_analysis(
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
-    tmle_wrapper = wrapper_tmle,
+    #tmle_wrapper = wrapper_tmle,
+    tmle_wrapper = wrapper_tmle_better,
     verbose = TRUE)
 # Now we have:
 # $ate - dataframe of ate estimates
