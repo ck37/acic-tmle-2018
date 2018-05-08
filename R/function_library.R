@@ -111,13 +111,12 @@ attr(startup, "packages_cran") = c(
   # Visualization
   "ggplot2",
   
-  "tmle",
-  
   # Machine learning.
   "bartMachine",
   "caret",
   "glmnet",
   #"mgcv",
+  "nnet",
   "xgboost",
   "ranger"
 )
