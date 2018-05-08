@@ -20,11 +20,16 @@ wrapper_tmle =
                                c(outcome_field, treatment_field, id_field))
   }
     
+  #####
+  # Setup SL libraries.
     
   # Placeholder library
   sl_lib = c("SL.mean", "SL.glm")
   
   q_lib = g_lib = sl_lib
+  
+  #####
+  # Define probability family for outcome.
   
   if (all(unique(data[[outcome_field]]) %in% c(0, 1))) {
     family = "binomial"
@@ -32,6 +37,8 @@ wrapper_tmle =
     family = "gaussian"
   }
   
+  #####
+  # Run estimator
   tmle_result = tmle(Y = data[[outcome_field]],
                      A = data[[treatment_field]],
                      W = data[, covariate_fields, drop = FALSE],
@@ -51,7 +58,8 @@ wrapper_tmle =
          ci_left = tmle_result$estimates$ATE$CI[1],
          ci_right = tmle_result$estimates$ATE$CI[2],
          # Dataframe of individual potential outcomes.
-         ipo_df = potential_outcomes_df)
+         ipo_df = potential_outcomes_df,
+         raw_obj = tmle_result)
   
   # These results will be processed within R/estimate-ate.R
   return(results)
