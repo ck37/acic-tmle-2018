@@ -25,7 +25,7 @@ clean_data_tmle =
   if (length(linear_combos$remove) > 0) {
 
     if (verbose) {
-      cat("Removing", length(linear_combos$remove), "Covariates due to collinearity:\n")
+      cat("Removing", length(linear_combos$remove), "covariates due to collinearity:\n")
       cat(paste0(colnames(covars_df)[linear_combos$remove - 1L], collapse = ", "), "\n")
       cat("Indices:", paste(linear_combos$remove, collapse = ", "), "\n") 
     }
