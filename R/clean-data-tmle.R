@@ -18,7 +18,7 @@ clean_data_tmle =
     
     rm(constant_columns)  
     
-  #Remove linearly correlated columns from the covariate file?
+  # Remove linearly correlated columns from the covariate file?
   linear_combos = caret::findLinearCombos(covars_df)
   remove_columns = linear_combos$remove
   
@@ -55,8 +55,8 @@ clean_data_tmle =
   }
   rm(cov_mat, qr_cov)
   
-  #Optional prescreening
-  if(prescreen){
+  # Optional prescreening
+  if (prescreen) {
     if (verbose) cat("Keep covariates with univariate associations. \n")
     
     # Identify non-binary variables.
@@ -77,7 +77,7 @@ clean_data_tmle =
     if (length(which(keep.nonbinary)) > 0) {
       
       new<-cbind.data.frame(names(data.frame(covars_df[, keep.nonbinary])),
-                            prescreen.uni(outcome_vec, treatment_vec, covars_df[, keep.nonbinary]^2, 
+                            prescreen_uni(outcome_vec, treatment_vec, covars_df[, keep.nonbinary]^2, 
                                           alpha=prescreen[1], min = 0))
       names(new)<-c("name","val")
       
@@ -111,24 +111,3 @@ clean_data_tmle =
   return(results)
 } 
 
-# keep covariates with univariate associations
-prescreen.uni <- function(Y, A, X, alpha = .05, min = 5, ...){
-  pvalues <- rep(NA, ncol(X))
-  for (i in 1:ncol(X)){
-    x=X[,i]
-    if (var(x)==0|sum(x==0)>=(length(x)-1)|sum(x==1)>=(length(x)-1)) pvalues[i]=1 else {
-      m <- lm(Y~ A+ X[,i])
-      p <- try(summary(m)$coef[3,4], silent = TRUE)
-      if (class(p) == "try-error") {
-        pvalues[i] <- 1
-      } else {
-        pvalues[i] <- p
-      }
-    }
-  }
-  keep <- pvalues <= alpha
-  if(sum(keep) < min){
-    keep[order(pvalues)[1:min]] <- TRUE
-  }
-  return(keep)
-}

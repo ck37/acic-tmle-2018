@@ -60,8 +60,8 @@ estimate_ate =
                                verbose = verbose))
     results =
       list(ate_est = tmle_result$ate_est,
-           ci_left = tmle_result$conf_int[1],
-           ci_right = tmle_result$conf_int[2],
+           ci_left = tmle_result$ci_left,
+           ci_right = tmle_result$ci_right,
            # Dataframe of individual potential outcomes.
            ipo_df = tmle_result$potential_outcomes)
   }
