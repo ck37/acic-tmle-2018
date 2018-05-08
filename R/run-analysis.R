@@ -54,15 +54,17 @@ run_analysis =
   # List of individual potential outcome estimates for each file.
   ipo_list = list()
   
-  # Looping over all counterfactual files.
+  # Looping over all "factual" files.
+  cat("\nBegin processing factual datasets.\n")
   for (file in files) {
-    # TODO: measure the execution time to analyze each file.
+    # Measure the execution time needed to analyze each file.
+    time_start = proc.time()
     
     # ufid = filename without the enclosing directory.
     ufid = gsub("^.*/([^./]+?)\\.csv$", "\\1", file, perl = TRUE)
     
     if (verbose) {
-      cat("Processing", ufid, "\n")
+      cat("Processing dataset", ufid, "\n")
     }
     
     # Import one counterfactual file
@@ -106,6 +108,10 @@ run_analysis =
     
     # Save individual potential outcome result.
     ipo_list[[ufid]] = tmle_result$ipo_df
+    
+    time_end = proc.time()
+    time_elapsed = (time_end - time_start)
+    cat("Time elapsed:", round(time_elapsed["elapsed"] / 60, 2), "minutes.\n")
   }
   
   # Compile results.
