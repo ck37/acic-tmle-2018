@@ -42,7 +42,7 @@ results =
 names(results)
 ```
 
-## Evaluate estimates
+## Evaluate: revere
 
 Evaluate our estimates if we have counterfactual files.
 
@@ -69,6 +69,17 @@ results_tmle =
 # $ipos - list with individual potential outcome estimates for each file.
 # $cf_files - vector of files to use for evaluating our estimates. 
 names(results_tmle)
+```
+
+## Evaluate: tmle
+
+Evaluate our estimates if we have counterfactual files.
+
+```{r eval_estimates}
+if (exists("results_tmle") && "cf_files" %in% names(results_tmle) && length(results_tmle$cf_files) > 0L) {
+  stats = evaluate_estimates(results_tmle, verbose = TRUE)
+  print(stats)
+}
 ```
 
 ## Create output files
