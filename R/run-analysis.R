@@ -11,7 +11,7 @@ run_analysis =
     outcome_field = "y",
     treatment_field = "z",
     tmle_wrapper = NULL,
-    prescreen=TRUE,
+    prescreen = TRUE,
     verbose = TRUE) {
   
   # Check that input_dir_counterfactuals exists
@@ -56,6 +56,8 @@ run_analysis =
   
   # Looping over all counterfactual files.
   for (file in files) {
+    # TODO: measure the execution time to analyze each file.
+    
     # ufid = filename without the enclosing directory.
     ufid = gsub("^.*/([^./]+?)\\.csv$", "\\1", file, perl = TRUE)
     
