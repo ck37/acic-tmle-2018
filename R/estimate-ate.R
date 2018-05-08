@@ -28,8 +28,10 @@ estimate_ate =
   covariate_df = data[, setdiff(colnames(data),
                                 c(outcome_field, treatment_field, id_field)), drop = FALSE]
   
-  # Preprocess covariate data before running TMLE. Remove constant columns, etc.
-  # This function is defined in R/clean-data-tmle.R
+  # Preprocess covariate data before running TMLE. 
+  # 1) Remove linearly correlated columns
+  # 2) Keeps covariates with univariate associations
+  # 3) Adds square terms
   covar_result = clean_data_tmle(covars_df = covariate_df,
                                  outcome_vec = outcome_vec,
                                  treatment_vec = treatment_vec,

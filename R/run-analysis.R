@@ -11,7 +11,7 @@ run_analysis =
     outcome_field = "y",
     treatment_field = "z",
     tmle_wrapper = NULL,
-    prescreen=TRUE,
+    prescreen = TRUE,
     verbose = TRUE) {
   
   # Check that input_dir_counterfactuals exists
