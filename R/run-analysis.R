@@ -87,7 +87,7 @@ run_analysis =
                                treatment_field = treatment_field,
                                id_field = id_field,
                                tmle_wrapper = tmle_wrapper,
-                               prescreen=prescreen,
+                               prescreen = prescreen,
                                verbose = verbose)
     
     # Put estimates into a list for rbinding into a dataframe.

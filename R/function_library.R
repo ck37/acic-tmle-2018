@@ -104,8 +104,9 @@ attr(startup, "packages_cran") = c(
   "RhpcBLASctl",
   "rio",
   "uuid",
+  "R6",
   "assertthat",
-  
+
   # Visualization
   "ggplot2",
   
