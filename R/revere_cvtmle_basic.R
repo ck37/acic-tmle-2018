@@ -222,6 +222,17 @@ subset_fold_training <- function(fold, subset_index){
   list(fold=make_fold(fold_index(),new_training,new_validation))
 }
 
+# sort n-dimensional array (for multinomial/multivariate SL support)
+aorder <- function(mat, index, along = 1) {
+  dims <- safe_dim(mat)
+  args <- ifelse(along == seq_along(dims), "index", "")
+  indexer <- paste(c(args, "drop=F"), collapse = ",")
+  call <- sprintf("mat[%s]", indexer)
+  result <- eval(parse(text = call))
+  
+  return(result)
+}
+
 Lrnr_cv2 <- R6Class(
   classname = "Lrnr_cv2",
   inherit = Lrnr_base,
@@ -367,3 +378,5 @@ Lrnr_cv2 <- R6Class(
     .required_packages = c("origami")
   )
 )
+
+
