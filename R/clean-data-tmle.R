@@ -62,8 +62,8 @@ clean_data_tmle =
     # Identify non-binary variables.
     nonbinary <- apply(covars_df,2,function(x) { length(unique(covars_df))>2 })
     
-    #Keep for all variables with default values
-    keep <- which(prescreen.uni(outcome_vec, treatment_vec, covars_df))
+    # Keep for all variables with default values
+    keep <- which(prescreen_uni(outcome_vec, treatment_vec, covars_df))
     
     keep.nonbinary<-data.frame(t(subset(t(nonbinary),select=keep)))
     names(keep.nonbinary)<-"val"
