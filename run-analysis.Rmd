@@ -24,9 +24,9 @@ ck37r::load_all_code("R")
 ))
 ```
 
-## Run analysis
+## Analysis: revere
 
-```{r run_analysis}
+```{r analysis_revere}
 
 # Generate analyses
 results =
@@ -51,6 +51,24 @@ if (exists("results") && "cf_files" %in% names(results) && length(results$cf_fil
   stats = evaluate_estimates(results, verbose = TRUE)
   print(stats)
 }
+```
+
+## Analysis: tmle
+
+```{r analysis_tmle}
+
+# Generate analyses
+results_tmle =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_tmle,
+    verbose = TRUE)
+# Now we have:
+# $ate - dataframe of ate estimates
+# $ipos - list with individual potential outcome estimates for each file.
+# $cf_files - vector of files to use for evaluating our estimates. 
+names(results_tmle)
 ```
 
 ## Create output files
