@@ -19,7 +19,7 @@ evaluate_estimates = function(results, verbose = FALSE) {
     # V1 appears to be an unncessary rownames column
     cf = rio::import(file)
     
-    cf_ate = mean(cf$y1) - mean(cf$y0)
+    cf_ate = mean(cf$y1, na.rm=TRUE) - mean(cf$y0,na.rm=TRUE)
     
     our_estimate = results$ate[results$ate$ufid == ufid, , drop = FALSE]
   

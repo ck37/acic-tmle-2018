@@ -106,6 +106,7 @@ attr(startup, "packages_cran") = c(
   "uuid",
   "R6",
   "assertthat",
+  "tmle",
 
   # Visualization
   "ggplot2",

@@ -90,7 +90,6 @@ revere_cvtmle_basic =
   inds = unlist(lapply(folds, FUN = function(x) x$validation_set))
   subsetted_inds = unlist(lapply(subsetted_folds, FUN = function(x) x$validation_set))
   
-  
   y = data[[outcome_field]]
   C = data[[censor_field]]
   z = data[[treatment_field]]
@@ -171,7 +170,7 @@ revere_cvtmle_basic =
   pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
   Q = matrix(c(Q0W, Q1W), ncol = 2)
   
-  # jury-rigging because data.table is obtuse to a moron non-programmer
+  # jury-rigging because data.table is obtuse
   data = as.data.frame(data)
   W = data[, covariates_Q, drop = FALSE]
   
@@ -186,7 +185,7 @@ revere_cvtmle_basic =
                    Q = Q,
                    pDelta1 = pDelta1,
                    g1W = g1W,
-                   family = "binomial",
+                   family = "gaussian",
                    fluctuation = "logistic")
   
   # grab the definitive epsilon

@@ -62,8 +62,8 @@ wrapper_revere_basic =
   # Compile results.  
   results =
     list(ate_est = tmle_result$ate_est,
-         ci_left = tmle_result$conf_int[1],
-         ci_right = tmle_result$conf_int[2],
+         ci_left = tmle_result$CI[2],
+         ci_right = tmle_result$CI[3],
          # Dataframe of individual potential outcomes.
          ipo_df = potential_outcomes_df)
    

@@ -91,14 +91,15 @@ run_analysis =
                                verbose = verbose)
     
     # Put estimates into a list for rbinding into a dataframe.
-    ate_result =
-      list(ufid = ufid,
-           # Population ATE.
-           effect_size = tmle_result$ate_est,
-           # Left confidence interval.
-           li = tmle_result$ci_left,
-           # Right confidence interval.
-           ri = tmle_result$ci_right)
+    ate_result = cbind.data.frame(ufid = ufid, 
+                            # Population ATE.
+                            effect_size = tmle_result$ate_est,
+                            # Left confidence interval.
+                            li = tmle_result$ci_left,
+                            # Right confidence interval.
+                            ri = tmle_result$ci_right
+                            )
+
     
     # Integrate into dataframe for the ATEs.
     ate_df = rbind.data.frame(ate_df, ate_result, stringsAsFactors = FALSE)
