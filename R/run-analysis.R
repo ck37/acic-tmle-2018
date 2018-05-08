@@ -82,7 +82,7 @@ run_analysis =
     # Run TMLE analysis.
     # Should return population ATE with inference, plus df of individual potential outcomes.
     # This function is defined in R/estimate-ate.R
-    tmle_result = estimate_ate(analysis_data,
+    estimate_result = estimate_ate(analysis_data,
                                outcome_field = outcome_field,
                                treatment_field = treatment_field,
                                id_field = id_field,
@@ -94,17 +94,28 @@ run_analysis =
     ate_result =
       list(ufid = ufid,
            # Population ATE.
-           effect_size = tmle_result$ate_est,
+           effect_size = estimate_result$ate_est,
            # Left confidence interval.
-           li = tmle_result$ci_left,
+           li = estimate_result$ci_left,
            # Right confidence interval.
-           ri = tmle_result$ci_right)
+           ri = estimate_result$ci_right)
     
     # Integrate into dataframe for the ATEs.
-    ate_df = rbind.data.frame(ate_df, ate_result, stringsAsFactors = FALSE)
+    tryCatch({
+      if (is.null(ate_df)) {
+        ate_df = ate_result
+      } else {
+        ate_df = rbind.data.frame(ate_df, ate_result, stringsAsFactors = FALSE)
+      }
+    }, error = function(e) {
+      print(e)
+      print(names(estimate_result))
+      print(ate_result)
+      browser()
+    })
     
     # Save individual potential outcome result.
-    ipo_list[[ufid]] = tmle_result$ipo_df
+    ipo_list[[ufid]] = estimate_result$ipo_df
   }
   
   # Compile results.

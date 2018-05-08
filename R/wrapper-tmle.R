@@ -58,8 +58,7 @@ wrapper_tmle =
          ci_left = tmle_result$estimates$ATE$CI[1],
          ci_right = tmle_result$estimates$ATE$CI[2],
          # Dataframe of individual potential outcomes.
-         ipo_df = potential_outcomes_df,
-         raw_obj = tmle_result)
+         potential_outcomes = potential_outcomes_df)
   
   # These results will be processed within R/estimate-ate.R
   return(results)
