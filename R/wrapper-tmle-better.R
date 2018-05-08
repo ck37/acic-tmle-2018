@@ -46,7 +46,7 @@ wrapper_tmle_better =
   # Setup SL libraries.
   
   q_lib = c(list(# speedglm doesn't work :/ just use plain ol' glm.
-    c("SL.glm", "All", "screen.corRank8", "prescreen_nosqr")#,
+    #c("SL.glm", "All", "screen.corRank8", "prescreen_nosqr")#,
     #c("SL.mgcv", "All", "prescreen.nosq"),
     #c("sg.gbm.2500", "prescreen.nocat"),
     #"SL.xgboost",
@@ -60,13 +60,13 @@ wrapper_tmle_better =
   #sl_ksvm$names, 
   list(
     #"SL.randomForest_fast",
-    "SL.xgboost_fast",
+    # "SL.xgboost_fast",
     "SL.ranger_fast",
     c("SL.glmnet_fast", "All", "screen.corRank8"),
     c("SL.nnet", "All", "screen.corRank8"),
     #c("SL.earth", "prescreen.nosq"),
     # Works only if parallel = F. Do not use with mcSuperlearner!
-    "SL.bartMachine2",
+    #"SL.bartMachine2",
     "SL.mean"))
   
   # Need a separate g lib that does not include effect modification learners.
