@@ -1,6 +1,8 @@
 # This is the revere function which will output the first pass revere
 # not fitting again on full data, so IC equation here is certainly solved
 
+# Relies on Lrnr_cv2 in R/lrnr_cv2.R
+
 revere_cvtmle_basic =
   function(data,
            outcome_field = "y",
@@ -211,6 +213,7 @@ revere_cvtmle_basic =
   
   return(results)
 }
+<<<<<<< HEAD
 
 
 # a function that saves our lives here--jeremy genius
@@ -377,3 +380,5 @@ Lrnr_cv2 <- R6Class(
   )
 )
 
+=======
+>>>>>>> e82e0996c47c4485ce9a621722310475cc4b4f48
