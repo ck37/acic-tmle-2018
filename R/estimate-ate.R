@@ -39,15 +39,21 @@ estimate_ate =
                                  prescreen = prescreen,
                                  verbose = verbose)
   covariate_df = covar_result$covariate_df
+  covariate_dfA = covar_result$covariate_dfA
   
   # Combine elements back into one unified dataframe.
   # TODO: confirm this works correctly.
-  data = cbind.data.frame(data[[outcome_field]], data[[treatment_field]],
+  dataY = cbind.data.frame(data[[outcome_field]], data[[treatment_field]],
                           covariate_df)
+  dataA = cbind.data.frame(data[[treatment_field]],
+                           covariate_dfA)
   
   # Make sure our names stay correct.
   # TODO: confirm this works correctly.
-  colnames(data)[1:2] = c(outcome_field, treatment_field)
+  colnames(dataY)[1:2] = c(outcome_field, treatment_field)
+  colnames(dataA)[1] = c(treatment_field)
+  
+  covariate_fields = list(Y=names(covariate_df), A=names(covariate_dfA))
   
   if (!is.null(tmle_wrapper)) {
     # We could have multiple versions of the tmle_wrapper function to try different approaches.
@@ -57,6 +63,7 @@ estimate_ate =
                                outcome_field = outcome_field,
                                treatment_field = treatment_field,
                                id_field = id_field,
+                               covariate_fields = covariate_fields,
                                verbose = verbose))
     results =
       list(ate_est = tmle_result$ate_est,

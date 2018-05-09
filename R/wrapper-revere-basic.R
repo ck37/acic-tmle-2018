@@ -21,7 +21,11 @@ wrapper_revere_basic =
   # Only exists in Jonathan's fork of sl3 - can't use this yet.
   # lrnr_bayesglm = make_learner(Lrnr_bayesglm)
   lrnr_xgboost = make_learner(Lrnr_xgboost)$initialize(nrounds = 1000, eta = .01, nthread = 4)
-  lrnr_stack_Q = make_learner(Stack, lrnr_glm, lrnr_mean)
+  #lrnr_bartMachine = make_learner(Lrnr_bartMachine)
+  lrnr_dbarts = make_learner(Lrnr_dbarts)
+  lrnr_grf = make_learner(Lrnr_grf)
+  
+  lrnr_stack_Q = make_learner(Stack, lrnr_glm, lrnr_mean, lrnr_dbarts, lrnr_grf, lrnr_xgboost)
   
   # metalearner_eval_Q = metalearner_logistic_binomial
   # metalearnerLogLik <- make_learner(Lrnr_optim)
@@ -33,13 +37,18 @@ wrapper_revere_basic =
   metalearner_Q = make_learner(Lrnr_nnls)
   
   if (is.null(covariate_fields)) {
-    covariate_fields = setdiff(colnames(data),
+    covariate_fieldsY = setdiff(colnames(data),
                                c(outcome_field, treatment_field, id_field))
+    covariate_fieldsA = setdiff(colnames(data),
+                                c(outcome_field, treatment_field, id_field))
+  }else{
+    covariate_fieldsY = covariate_fields$Y
+    covariate_fieldsA = covariate_fields$A
   }
   
   # Include treatment indicator in outcome regression.
-  covariates_Q = c(treatment_field, covariate_fields)
-  covariates_g = covariate_fields
+  covariates_Q = c(treatment_field, covariate_fieldsY)
+  covariates_g = covariate_fieldsA
     
   # Call revere basic, defined in R/revere_cvtmle_basic.R
   tmle_result =

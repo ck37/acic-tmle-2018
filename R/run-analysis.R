@@ -101,7 +101,6 @@ run_analysis =
                             # Right confidence interval.
                             ri = tmle_result$ci_right
                             )
-
     
     # Integrate into dataframe for the ATEs.
     ate_df = rbind.data.frame(ate_df, ate_result, stringsAsFactors = FALSE)
