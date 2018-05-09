@@ -213,7 +213,6 @@ revere_cvtmle_basic =
   
   return(results)
 }
-<<<<<<< HEAD
 
 
 # a function that saves our lives here--jeremy genius
@@ -380,5 +379,4 @@ Lrnr_cv2 <- R6Class(
   )
 )
 
-=======
->>>>>>> e82e0996c47c4485ce9a621722310475cc4b4f48
+
