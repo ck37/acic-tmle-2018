@@ -78,7 +78,7 @@ Lrnr_cv2 <- R6Class(
       # TODO: maybe write delayed_cross_validate (as it'd be a neat thing to
       # have around anyway)
       cv_results <- lapply(folds, delayed_cv_train, learner, task)
-      result <- bundle_delayed(cv_results)
+      result <- delayed::bundle_delayed(cv_results)
       return(result)
     },
     
