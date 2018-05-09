@@ -16,6 +16,34 @@ aorder <- function(mat, index, along = 1) {
   return(result)
 }
 
+#' Fit/Predict a learner with Cross Validation (JL edits for ACIC)
+#'
+#' A wrapper around any learner that generates cross-validate predictions
+#'
+#' @docType class
+#'
+#' @importFrom R6 R6Class
+#' @importFrom assertthat assert_that is.count is.flag
+#' @importFrom origami training validation fold_index
+#'
+#' @export
+#'
+#' @keywords data
+#'
+#' @return Learner object with methods for training and prediction. See
+#'  \code{\link{Lrnr_base}} for documentation on learners.
+#'
+#' @format \code{\link{R6Class}} object.
+#'
+#' @family Learners
+#'
+#' @section Parameters:
+#' \describe{
+#'   \item{\code{learner}}{The learner to wrap}
+#'   \item{\code{folds=NULL}}{An \code{origami} folds object. If \code{NULL},
+#'    folds from the task are used}
+#' }
+#
 Lrnr_cv2 <- R6Class(
   classname = "Lrnr_cv2",
   inherit = Lrnr_base,
