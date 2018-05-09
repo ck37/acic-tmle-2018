@@ -1,6 +1,5 @@
-# This is the revere function which will output the first pass revere and the full
-# revere, which does not solve the IC equation but comes from a model which does 
-# and is slightly more efficient
+# This is the revere function which will output the first pass revere
+# not fitting again on full data, so IC equation here is certainly solved
 
 revere_cvtmle_basic =
   function(data,
@@ -377,5 +376,4 @@ Lrnr_cv2 <- R6Class(
     .required_packages = c("origami")
   )
 )
-
 
