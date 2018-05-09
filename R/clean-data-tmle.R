@@ -55,6 +55,16 @@ clean_data_tmle =
   }
   rm(cov_mat, qr_cov)
   
+  original<-covars_df
+  
+  #Add square terms
+  Wsq_all <- covars_df^2
+  colnames(Wsq_all) <- paste0(colnames(Wsq_all), "sq")
+  
+  # Add squared terms to X.
+  original<-cbind(original, Wsq_all)
+  n.columns <- ncol(original)
+
   # Optional prescreening
   # Separately for treatment and outcome
   if (prescreen) {
@@ -74,12 +84,11 @@ clean_data_tmle =
     
     keep.nonbin_sub<-subset(keep.nonbinary, val=="TRUE")
     keep.nonbinary<-names(data.frame(covars_df)) %in% row.names(keep.nonbin_sub)
-    
     keep.nonbin_subA<-subset(keep.nonbinaryA, val=="TRUE")
     keep.nonbinaryA<-names(data.frame(covars_df)) %in% row.names(keep.nonbin_subA)
     
     #Outcome
-    Wsq = NULL
+    WsqY = NULL
     
     if (length(which(keep.nonbinary)) > 0) {
       
@@ -92,8 +101,8 @@ clean_data_tmle =
       keep.sq<-names(data.frame(covars_df)) %in% keep.nonbin_sub$name
       
       if (sum(keep.sq) > 0) {
-        Wsq <- covars_df[, keep.sq, drop = FALSE]^2
-        colnames(Wsq) <- paste0(colnames(Wsq), "sq")
+        WsqY <- covars_df[, keep.sq, drop = FALSE]^2
+        colnames(WsqY) <- paste0(colnames(WsqY), "sq")
       }
     }
     
@@ -116,30 +125,28 @@ clean_data_tmle =
       }
     }
     
-    # Add squared terms to covars_df.
-    covars_df <- cbind(covars_df[, keep], Wsq)
-    n.columns <- ncol(covars_df)
+    # Add squared terms to covars_df for Y
+    covars_dfY <- cbind(covars_df[, keep], WsqY)
+    n.columns <- ncol(covars_dfY)
     
+    # Add squared terms to covars_df for A
     covars_dfA <- cbind(covars_df[, keepA], WsqA)
     n.columnsA <- ncol(covars_dfA)
     
     }else {
       if (verbose) cat("Keep all covariates. \n")
       
-      Wsq <- covars_df^2
-      colnames(Wsq) <- paste0(colnames(Wsq), "sq")
-      
       # Add squared terms to X.
-      covars_df<-cbind(covars_df, Wsq)
+      covars_df<-cbind(covars_df, Wsq_all)
       n.columns <- ncol(covars_df)
       
-      covars_dfA<-cbind(covars_df, Wsq)
+      covars_dfA<-cbind(covars_df, Wsq_all)
       n.columnsA <- ncol(covars_dfA)
-      
     }
-
+  
   results = list(
-    covariate_df = covars_df,
+    data = original,
+    covariate_dfY = covars_df,
     covariate_dfA = covars_dfA
   )
   return(results)
