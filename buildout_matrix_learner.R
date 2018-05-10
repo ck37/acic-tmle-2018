@@ -10,6 +10,7 @@
   data.frame(z, C, W1, W2, W3, W4, y)
 }
 
+
 g0_linear = function(W1, W2, W3, W4) {
   plogis(0.5 * (-0.8 * W1 + 0.39 * W2 + 0.08 * W3 - 0.12 *
                   W4 - 0.15))
