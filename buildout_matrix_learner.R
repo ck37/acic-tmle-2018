@@ -1,5 +1,5 @@
 
-  gendata = function(n, g0, c0, Q0) {
+gendata = function(n, g0, c0, Q0) {
   W1 = runif(n, -3, 3)
   W2 = rnorm(n)
   W3 = runif(n)
@@ -62,18 +62,19 @@ interactions_plus_sq = create_sq_inters(colnames(data)[c(1,3:6)], colnames(data)
 lrnr_interactions_squares = Lrnr_define_interactions$new(interactions = interactions_plus_sq)
 
 
-# task = make_sl3_Task(data = data, covariates = cov_names, outcome = "y")
-# int_pipeline = make_learner(Pipeline, lrnr_interactions_squares, lrnr_glm)
-# 
-# int_pipeline_fit = int_pipeline$train(task)
-# int_pipeline_fit$predict()[1:10]
+task = make_sl3_Task(data = data, covariates = colnames(data[c(1,3:6)]), outcome = "y")
+lrnr_glm = make_learner(Lrnr_glm)
+int_pipeline = make_learner(Pipeline, lrnr_interactions_squares, lrnr_glm)
 
-# check with regular chaining
-# int_fit = lrnr_interactions_squares$train(task)
-# int_task = int_fit$chain()
-# int_glm_fit = lrnr_glm$train(int_task)
-# int_glm_fit$coefficients
-# int_glm_fit$predict()[1:10]
+int_pipeline_fit = int_pipeline$train(task)
+int_pipeline_fit$predict()[1:10]
+
+check with regular chaining
+int_fit = lrnr_interactions_squares$train(task)
+int_task = int_fit$chain()
+int_glm_fit = lrnr_glm$train(int_task)
+int_glm_fit$coefficients
+int_glm_fit$predict()[1:10]
 
 
 
