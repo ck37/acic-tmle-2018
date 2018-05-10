@@ -30,6 +30,7 @@ n=1000
 data = gendata(n, g0_linear, c0, Q0_1)
 head(data)
 
+# function to create the list to be fed into sl3 learner
 create_sq_inters = function(inter_names, sq_names) {
   combos = combn(1:length(inter_names),2)
   int_vars = lapply(1:ncol(combos), FUN = function(col) {
@@ -69,7 +70,7 @@ int_pipeline = make_learner(Pipeline, lrnr_interactions_squares, lrnr_glm)
 int_pipeline_fit = int_pipeline$train(task)
 int_pipeline_fit$predict()[1:10]
 
-check with regular chaining
+# check with regular chaining by hand
 int_fit = lrnr_interactions_squares$train(task)
 int_task = int_fit$chain()
 int_glm_fit = lrnr_glm$train(int_task)
