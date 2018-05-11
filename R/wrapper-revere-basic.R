@@ -18,16 +18,22 @@ wrapper_revere_basic =
     
   lrnr_mean = make_learner(Lrnr_mean)
   lrnr_glm = make_learner(Lrnr_glm)
+  lrnr_glmnet = make_learner(Lrnr_glmnet)
   # Only exists in Jonathan's fork of sl3 - can't use this yet.
   # lrnr_bayesglm = make_learner(Lrnr_bayesglm)
   lrnr_xgboost = make_learner(Lrnr_xgboost)$initialize(nrounds = 1000, eta = .01, nthread = 4)
-  #lrnr_bartMachine = make_learner(Lrnr_bartMachine)
+  lrnr_bartMachine = make_learner(Lrnr_bartMachine)
   lrnr_dbarts = make_learner(Lrnr_dbarts)
   lrnr_grf = make_learner(Lrnr_grf)
   
-  lrnr_stack_Q = make_learner(Stack, lrnr_glm, lrnr_mean,
-                              #lrnr_dbarts,
-                              #lrnr_grf,
+  lrnr_stack_Q = make_learner(Stack,
+                              lrnr_mean,
+                              lrnr_glm, 
+                              lrnr_glmnet,
+                              # TODO: increase java memory so we can use bartMachine
+                              # lrnr_bartMachine,
+                              # lrnr_dbarts,
+                              # lrnr_grf,
                               lrnr_xgboost)
   
   # metalearner_eval_Q = metalearner_logistic_binomial
