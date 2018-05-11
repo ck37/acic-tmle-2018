@@ -51,6 +51,7 @@ estimate_ate =
   # TODO: confirm this works correctly.
   colnames(data_new)[1:2] = c(outcome_field, treatment_field)
   
+  # TODO: add censoring covariates.
   covariate_fields = list(Y=names(covariate_df), A=names(covariate_dfA))
   
   if (!is.null(tmle_wrapper)) {
