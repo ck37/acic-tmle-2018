@@ -25,7 +25,10 @@ wrapper_revere_basic =
   lrnr_dbarts = make_learner(Lrnr_dbarts)
   lrnr_grf = make_learner(Lrnr_grf)
   
-  lrnr_stack_Q = make_learner(Stack, lrnr_glm, lrnr_mean, lrnr_dbarts, lrnr_grf, lrnr_xgboost)
+  lrnr_stack_Q = make_learner(Stack, lrnr_glm, lrnr_mean,
+                              #lrnr_dbarts,
+                              #lrnr_grf,
+                              lrnr_xgboost)
   
   # metalearner_eval_Q = metalearner_logistic_binomial
   # metalearnerLogLik <- make_learner(Lrnr_optim)
