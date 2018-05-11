@@ -181,7 +181,10 @@ revere_cvtmle_basic =
     # stopifnot(length(z) == nrow(Q))
     
     # feeding into susan's package (tmle) to target only--very fast
-    tmle_info = tmle(Y = y,
+    # Suppress the warnings about recycling array of length 1 due to sqrt(ATE).
+    suppressWarnings({
+        tmle_info =
+          tmle::tmle(Y = y,
                      A = z,
                      W = W,
                      Delta = 1 - C,
@@ -190,6 +193,7 @@ revere_cvtmle_basic =
                      g1W = g1W,
                      family = "gaussian",
                      fluctuation = "logistic")
+    })
   } else {
     
     Q = matrix(c(Q0W, Q1W), ncol = 2)
@@ -202,12 +206,17 @@ revere_cvtmle_basic =
     # stopifnot(length(z) == nrow(Q))
     
     # feeding into susan's package (tmle) to target only--very fast
-    tmle_info = tmle(Y = y,
-                     A = z,
-                     W = W,
-                     g1W = g1W,
-                     family = "gaussian",
-                     fluctuation = "logistic") 
+    
+    # Suppress the warnings about recycling array of length 1 due to sqrt(ATE).
+    suppressWarnings({
+      tmle_info =
+        tmle::tmle(Y = y,
+                   A = z,
+                   W = W,
+                   g1W = g1W,
+                   family = "gaussian",
+                   fluctuation = "logistic") 
+    })
   }
   # grab the definitive epsilon
 
