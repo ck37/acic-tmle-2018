@@ -63,7 +63,7 @@ interactions_plus_sq = create_sq_inters(colnames(data)[c(1,3:6)], colnames(data)
 lrnr_interactions_squares = Lrnr_define_interactions$new(interactions = interactions_plus_sq)
 
 
-task = make_sl3_Task(data = data, covariates = colnames(data[c(1,3:6)]), outcome = "y")
+task = make_sl3_Task(data = data, covariates = colnames(data)[c(1,3:6)], outcome = "y")
 lrnr_glm = make_learner(Lrnr_glm)
 int_pipeline = make_learner(Pipeline, lrnr_interactions_squares, lrnr_glm)
 
