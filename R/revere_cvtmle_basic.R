@@ -135,78 +135,93 @@ revere_cvtmle_basic =
   # stacked val set preds on very close to new data
   g1W = metalearner_eval_g(coefg, as.matrix(g1W_stack))
   
-  # fit on folds and predict on subsetted folds for g and c
-  c1W_task = make_sl3_Task(data = data, covariates = covariates_Q,
-                           outcome = censor_field,
-                           folds = folds)
-  
-  # need to fit for A=1 and for A=0 so we make these tasks
-  c1W_taskA1 = make_sl3_Task(data = dataQ1W, covariates = covariates_Q,
+  if (any(C==1)) {
+    # fit on folds and predict on subsetted folds for g and c
+    c1W_task = make_sl3_Task(data = data, covariates = covariates_Q,
                              outcome = censor_field,
                              folds = folds)
-  c1W_taskA0 = make_sl3_Task(data = dataQ0W, covariates = covariates_Q,
-                             outcome = censor_field,
-                             folds = folds)
-  
-  # fit on the training sets
-  cv_lrnr_fitc = cv_lrnr_c$train(c1W_task)
-  
-  # predict on stacked val sets--no overfitting here!
-  c1W_stack = cv_lrnr_fitc$predict()
-  # these are prob of cens scores for A=0  and A=1
-  c1W_stackA1 = cv_lrnr_fitc$predict(c1W_taskA1)
-  c1W_stackA0 = cv_lrnr_fitc$predict(c1W_taskA0)
-  
-  # fit the metalearner
-  Z_c = make_sl3_Task(data = cbind(C = C, c1W_stack), 
-                      covariates = names(c1W_stack),
-                      outcome = censor_field)
-  cfit = metalearner_c$train(Z_c)
-  coefc = cfit$coefficients
-  
-  # 1 minus to get probability of being observed for both A=1 and A=0 obs
-  c1W_A1 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA1))
-  c1W_A0 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA0))
-  
-  pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
-  Q = matrix(c(Q0W, Q1W), ncol = 2)
-  
-  # jury-rigging because data.table is obtuse
-  data = as.data.frame(data)
-  W = data[, covariates_Q, drop = FALSE]
-  
-  # Confirm length of z is equal to nrow of Q.
-  # stopifnot(length(z) == nrow(Q))
-  
-  # feeding into susan's package (tmle) to target only--very fast
-  tmle_info = tmle(Y = y,
-                   A = z,
-                   W = W,
-                   Delta = 1 - C,
-                   Q = Q,
-                   pDelta1 = pDelta1,
-                   g1W = g1W,
-                   family = "gaussian",
-                   fluctuation = "logistic")
-  
+    
+    # need to fit for A=1 and for A=0 so we make these tasks
+    c1W_taskA1 = make_sl3_Task(data = dataQ1W, covariates = covariates_Q,
+                               outcome = censor_field,
+                               folds = folds)
+    c1W_taskA0 = make_sl3_Task(data = dataQ0W, covariates = covariates_Q,
+                               outcome = censor_field,
+                               folds = folds)
+    
+    # fit on the training sets
+    cv_lrnr_fitc = cv_lrnr_c$train(c1W_task)
+    
+    # predict on stacked val sets--no overfitting here!
+    c1W_stack = cv_lrnr_fitc$predict()
+    # these are prob of cens scores for A=0  and A=1
+    c1W_stackA1 = cv_lrnr_fitc$predict(c1W_taskA1)
+    c1W_stackA0 = cv_lrnr_fitc$predict(c1W_taskA0)
+    
+    # fit the metalearner
+    Z_c = make_sl3_Task(data = cbind(C = C, c1W_stack), 
+                        covariates = names(c1W_stack),
+                        outcome = censor_field)
+    cfit = metalearner_c$train(Z_c)
+    coefc = cfit$coefficients
+    
+    # 1 minus to get probability of being observed for both A=1 and A=0 obs
+    c1W_A1 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA1))
+    c1W_A0 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA0))
+    
+    pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
+    
+    Q = matrix(c(Q0W, Q1W), ncol = 2)
+    
+    # jury-rigging because data.table is obtuse
+    data = as.data.frame(data)
+    W = data[, covariates_Q, drop = FALSE]
+    
+    # Confirm length of z is equal to nrow of Q.
+    # stopifnot(length(z) == nrow(Q))
+    
+    # feeding into susan's package (tmle) to target only--very fast
+    tmle_info = tmle(Y = y,
+                     A = z,
+                     W = W,
+                     Delta = 1 - C,
+                     Q = Q,
+                     pDelta1 = pDelta1,
+                     g1W = g1W,
+                     family = "gaussian",
+                     fluctuation = "logistic")
+  } else {
+    
+    Q = matrix(c(Q0W, Q1W), ncol = 2)
+    
+    # jury-rigging because data.table is obtuse
+    data = as.data.frame(data)
+    W = data[, covariates_Q, drop = FALSE]
+    
+    # Confirm length of z is equal to nrow of Q.
+    # stopifnot(length(z) == nrow(Q))
+    
+    # feeding into susan's package (tmle) to target only--very fast
+    tmle_info = tmle(Y = y,
+                     A = z,
+                     W = W,
+                     g1W = g1W,
+                     family = "gaussian",
+                     fluctuation = "logistic") 
+  }
   # grab the definitive epsilon
 
-  preds_star = tmle_info$Qstar[,1]*(1-z) + tmle_info$Qstar[,2]*z
-  CATE_star = tmle_info$Qstar[,2] - tmle_info$Qstar[,1]
-  preds_init = tmle_info$Qinit$Q[,1]*(1-z) + tmle_info$Qinit$Q[,2]*z
-  CATE_init = tmle_info$Qinit$Q[,2] - tmle_info$Qinit$Q[,1]
+  y0 = tmle_info$Qinit$Q[,1] 
+  y1 = tmle_info$Qinit$Q[,2]
   
   CI = c(tmle_info$estimates$ATE$psi, tmle_info$estimates$ATE$CI)
   
   # Compile individual predictions.
-  preds_all = data.frame(preds_star = preds_star,
-                         CATE_star = CATE_star,
-                         preds_init = preds_init,
-                         CATE_init = CATE_init)
+  potential_oc = data.frame(y0 = y0, y1 = y1)
   
   # Compile results.
   results =
-    list(preds_all = preds_all,
+    list(potential_oc = potential_oc,
          ate_est = tmle_info$estimates$ATE$psi,
          conf_int = tmle_info$estimates$ATE$CI,
          CI = CI)

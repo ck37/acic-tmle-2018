@@ -41,7 +41,7 @@ Q0_1 = function(z, W1, W2, W3, W4) {
 }
 
 # metalearnerQ =  make_learner(Lrnr_nnls)
-if (F) {
+# if (F) {
   # Run manually.
   
   n = 1000
@@ -82,9 +82,9 @@ if (F) {
                         metalearner_Q = metalearner_Q, 
                         metalearner_eval_Q = metalearner_eval_Q)
   
-  res_revere$cover
+  res_revere$potential_oc
   res_revere$CI
-  
-  res_revere$SLcoefs
-}
+  res_revere$ate_est
+  res_revere$conf_int
+# }
 
