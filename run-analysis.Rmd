@@ -22,6 +22,8 @@ ck37r::load_all_code("R")
   # IPO = Individual potential outcomes
   output_dir_ipo = "exports/ipo-test"
 ))
+
+results = list()
 ```
 
 ## Analysis: revere
@@ -29,7 +31,7 @@ ck37r::load_all_code("R")
 ```{r analysis_revere}
 
 # Generate analyses
-results =
+results$revere =
   run_analysis(
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
@@ -39,7 +41,7 @@ results =
 # $ate - dataframe of ate estimates
 # $ipos - list with individual potential outcome estimates for each file.
 # $cf_files - vector of files to use for evaluating our estimates. 
-names(results)
+names(results$revere)
 ```
 
 ## Evaluate: revere
@@ -47,9 +49,12 @@ names(results)
 Evaluate our estimates if we have counterfactual files.
 
 ```{r eval_estimates}
-if (exists("results") && "cf_files" %in% names(results) && length(results$cf_files) > 0L) {
-  stats = evaluate_estimates(results, verbose = TRUE)
+if (exists("results") && "revere" %in% names(results) &&
+    "cf_files" %in% names(results$revere) && length(results$revere$cf_files) > 0L) {
+  stats = evaluate_estimates(results$revere, verbose = TRUE)
   print(stats)
+  save(results, stats,
+       file = "data/revere-results-stats.RData")
 }
 ```
 
