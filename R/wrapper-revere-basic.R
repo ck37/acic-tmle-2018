@@ -67,17 +67,13 @@ wrapper_revere_basic =
                          metalearner_eval_Q = metalearner_eval_Q,
                          verbose = verbose)
   
-  # TODO: Create potential outcomes dataframe out of the preds_all dataframe.
-  # Which columns should we use for y0 and y1?
-  potential_outcomes_df = data.frame()
-  
   # Compile results.  
   results =
     list(ate_est = tmle_result$ate_est,
          ci_left = tmle_result$CI[2],
          ci_right = tmle_result$CI[3],
          # Dataframe of individual potential outcomes.
-         ipo_df = potential_outcomes_df)
+         ipo_df = tmle_result$potential_oc)
    
   # These results will be processed within R/estimate-ate.R
   return(results)
