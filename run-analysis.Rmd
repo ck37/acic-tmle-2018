@@ -85,35 +85,53 @@ if (exists("results") && "revere_glm" %in% names(results) &&
 
 50% coverage!
 
-## Analysis: tmle
+## Analysis: tmle-glm
 
-```{r analysis_tmle}
-
-# Generate analyses
-results_tmle =
+```{r analysis_tmle_glm}
+results$tmle_glm =
   run_analysis(
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
-    #tmle_wrapper = wrapper_tmle,
+    tmle_wrapper = wrapper_tmle_glm,
+    # Need to do stratified cross-validation. Should fit SL outside of tmle.
+    #specific_files = c("9333a461d3944d089ef60cdf3b88fd40"),
+    verbose = TRUE)
+```
+
+## Evaluate: tmle-glm
+
+```{r eval_tmle_glm}
+if (exists("results") && "tmle_glm" %in% names(results) &&
+    "cf_files" %in% names(results$tmle_glm) && length(results$tmle_glm$cf_files) > 0L) {
+  stats = evaluate_estimates(results$tmle_glm, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-tmle-glm.RData")
+}
+```
+
+## Analysis: tmle
+
+```{r analysis_tmle}
+results$tmle =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
     tmle_wrapper = wrapper_tmle_better,
     # Need to do stratified cross-validation. Should fit SL outside of tmle.
     specific_files = c("9333a461d3944d089ef60cdf3b88fd40"),
     verbose = TRUE)
-# Now we have:
-# $ate - dataframe of ate estimates
-# $ipos - list with individual potential outcome estimates for each file.
-# $cf_files - vector of files to use for evaluating our estimates. 
-names(results_tmle)
 ```
 
 ## Evaluate: tmle
 
-Evaluate our estimates if we have counterfactual files.
-
-```{r eval_estimates}
-if (exists("results_tmle") && "cf_files" %in% names(results_tmle) && length(results_tmle$cf_files) > 0L) {
-  stats = evaluate_estimates(results_tmle, verbose = TRUE)
+```{r eval_tmle}
+if (exists("results") && "tmle" %in% names(results) &&
+    "cf_files" %in% names(results$tmle) && length(results$tmle$cf_files) > 0L) {
+  stats = evaluate_estimates(results$tmle, verbose = TRUE)
   print(stats)
+  save(results, stats,
+       file = "data/results-stats-tmle.RData")
 }
 ```
 
