@@ -82,7 +82,17 @@ revere_cvtmle_basic =
                            folds = folds)
   
   # train Qbar on the folds using uncensored 
+  if (verbose) {
+    cat("Fitting outcome regression...")
+  }
+  time_start = proc.time()
   cv_lrnr_fit = cv_lrnr_Q$train(QAW_task_sub)
+  time_end = proc.time()
+  time_outcome_reg = (time_end - time_start)["elapsed"]
+  if (verbose) {
+    cat(" done. Time elapsed:", round(time_outcome_reg / 60, 1), "minutes.\n")
+    # TODO: display more diagnostics like best learner & estimated risk.
+  }
   
   # predict on uncensored validation sets to feed to the metalearner, no overfitting here!
   QAW_stack_sub = cv_lrnr_fit$predict(QAW_task_sub)
@@ -120,7 +130,17 @@ revere_cvtmle_basic =
                            folds = folds)
   
   # fit on training folds
+  if (verbose) {
+    cat("Fitting treatment regression...")
+  }
+  time_start = proc.time()
   cv_lrnr_fitg = cv_lrnr_g$train(g1W_task)
+  time_end = proc.time()
+  time_treatment_reg = (time_end - time_start)["elapsed"]
+  if (verbose) {
+    cat(" done. Time elapsed:", round(time_treatment_reg / 60, 1), "minutes.\n")
+    # TODO: display more diagnostics like best learner & estimated risk.
+  }
   
   # predict on stacked val sets--no overfitting here!
   g1W_stack = cv_lrnr_fitg$predict()
@@ -150,7 +170,17 @@ revere_cvtmle_basic =
                                folds = folds)
     
     # fit on the training sets
+    if (verbose) {
+      cat("Fitting censoring regression...")
+    }
+    time_start = proc.time()
     cv_lrnr_fitc = cv_lrnr_c$train(c1W_task)
+    time_end = proc.time()
+    time_censor_reg = (time_end - time_start)["elapsed"]
+    if (verbose) {
+      cat(" done. Time elapsed:", round(time_censor_reg / 60, 1), "minutes.\n")
+      # TODO: display more diagnostics like best learner & estimated risk.
+    }
     
     # predict on stacked val sets--no overfitting here!
     c1W_stack = cv_lrnr_fitc$predict()
@@ -213,6 +243,7 @@ revere_cvtmle_basic =
         tmle::tmle(Y = y,
                    A = z,
                    W = W,
+                   Q = Q,
                    g1W = g1W,
                    family = "gaussian",
                    fluctuation = "logistic") 

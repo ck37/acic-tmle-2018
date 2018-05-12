@@ -2,6 +2,7 @@
 run_analysis =
   function(
     input_dir_counterfactuals = "data-raw/practice-censoring",
+    specific_files = NULL,
     # Inputs are all *.csvs that don't end in _cf.csv
     # This is a regex with a negative lookbehind.
     input_pattern = "(?<!_cf)\\.csv$",
@@ -37,7 +38,7 @@ run_analysis =
   
   # Check that input_file_covariates exists.
   if (!file.exists(input_file_covariates)) {
-    stop(paste("Counterfactual directory not found:", input_file_covariates))
+    stop(paste("Covariate file not found:", input_file_covariates))
   }
   
   # Import covariate dataset
@@ -63,8 +64,18 @@ run_analysis =
     # ufid = filename without the enclosing directory.
     ufid = gsub("^.*/([^./]+?)\\.csv$", "\\1", file, perl = TRUE)
     
+    # Potentially limit to a set of ufids that were specified.
+    if (!is.null(specific_files)) {
+      if (!ufid %in% specific_files) {
+        if (verbose) {
+          cat("Skipping", ufid, "- not one of the specific files.\n")
+        }
+        next
+      }
+    }
+    
     if (verbose) {
-      cat("Processing dataset", ufid, "\n")
+      cat("Processing dataset", ufid, "file", which(file == files), "of", length(files), "\n")
     }
     
     # Import one counterfactual file
@@ -80,6 +91,15 @@ run_analysis =
     
     # Remove the sample_id from the data that we analyze.
     analysis_data[[id_field]] = NULL
+    
+    if (verbose) {
+      cat("Observations:", prettyNum(nrow(analysis_data), big.mark = ","),
+          "Treated pct:",
+          paste0(round(mean(analysis_data[[treatment_field]], na.rm = TRUE) * 100, 1), "%"),
+          "Censored pct:",
+          paste0(round(mean(is.na(analysis_data[[outcome_field]])) * 100, 1), "%"),
+          "\n")
+    }
     
     # Run TMLE analysis.
     # Should return population ATE with inference, plus df of individual potential outcomes.
@@ -110,7 +130,7 @@ run_analysis =
     
     time_end = proc.time()
     time_elapsed = (time_end - time_start)
-    cat("Time elapsed:", round(time_elapsed["elapsed"] / 60, 2), "minutes.\n")
+    cat("Time elapsed:", round(time_elapsed["elapsed"] / 60, 1L), "minutes.\n\n")
   }
   
   # Compile results.
