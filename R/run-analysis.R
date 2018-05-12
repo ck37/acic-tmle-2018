@@ -110,7 +110,7 @@ run_analysis =
     
     time_end = proc.time()
     time_elapsed = (time_end - time_start)
-    cat("Time elapsed:", round(time_elapsed["elapsed"] / 60, 2), "minutes.\n")
+    cat("Time elapsed:", round(time_elapsed["elapsed"] / 60, 2), "minutes.\n\n")
   }
   
   # Compile results.
