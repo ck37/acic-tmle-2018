@@ -33,17 +33,19 @@ wrapper_revere_basic =
   lrnr_dbarts = make_learner(Lrnr_dbarts)
   lrnr_grf = make_learner(Lrnr_grf)
   
-  lrnr_stack_Q = make_learner(Stack,
-                              lrnr_mean,
-                              #lrnr_glm, 
-                              lrnr_glm_fast, 
-                              # TODO: fix glmnet, is yielding warnings and not working.
-                              # lrnr_glmnet,
-                              # TODO: increase java memory so we can use bartMachine
-                              # lrnr_bartMachine,
-                              # lrnr_dbarts,
-                              # lrnr_grf,
-                              lrnr_xgboost)
+  lrnr_stack_Q =
+    make_learner(Stack,
+                 lrnr_mean,
+                 lrnr_glm, 
+                 # failing with "system is computationally singular" errors.
+                 #lrnr_glm_fast, 
+                 # TODO: fix glmnet, is yielding warnings and not working.
+                 # lrnr_glmnet,
+                 # TODO: increase java memory so we can use bartMachine
+                 # lrnr_bartMachine,
+                 # lrnr_dbarts,
+                 # lrnr_grf,
+                 lrnr_xgboost)
   
   # metalearner_eval_Q = metalearner_logistic_binomial
   # metalearnerLogLik <- make_learner(Lrnr_optim)
