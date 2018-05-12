@@ -118,6 +118,21 @@ revere_cvtmle_basic =
   Q1W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q1W_task)))
   Q0W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q0W_task)))
   
+  if (max(QAW, na.rm = TRUE) > max(y, na.rm = TRUE) ||
+      min(QAW, na.rm = TRUE) < min(y, na.rm = TRUE)) {
+    warning("QAW predictions are outside of Y bounds - sl3 library may be misconfigured.")
+  }
+  
+  if (max(Q1W, na.rm = TRUE) > max(y, na.rm = TRUE) ||
+      min(Q1W, na.rm = TRUE) < min(y, na.rm = TRUE)) {
+    warning("Q1W predictions are outside of Y bounds - sl3 library may be misconfigured.")
+  }
+  
+  if (max(Q0W, na.rm = TRUE) > max(y, na.rm = TRUE) ||
+      min(Q0W, na.rm = TRUE) < min(y, na.rm = TRUE)) {
+    warning("Q1W predictions are outside of Y bounds - sl3 library may be misconfigured.")
+  }
+  
   # setting censored outcomes to NA because that's how they should be coded in reality'
   y[C == 1] = NA
   
@@ -154,6 +169,10 @@ revere_cvtmle_basic =
   
   # stacked val set preds on very close to new data
   g1W = metalearner_eval_g(coefg, as.matrix(g1W_stack))
+  
+  if (max(g1W, na.rm = TRUE) > 1 || min(g1W, na.rm = TRUE) < 0) {
+    warning("g1W predictions are outside of [0, 1] - sl3 library may be misconfigured.")
+  }
   
   if (any(C==1)) {
     # fit on folds and predict on subsetted folds for g and c
@@ -198,6 +217,16 @@ revere_cvtmle_basic =
     # 1 minus to get probability of being observed for both A=1 and A=0 obs
     c1W_A1 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA1))
     c1W_A0 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA0))
+    
+    # Check if we are within bounds for a [0, 1] prediction.
+    if (max(c1W_A1, na.rm = TRUE) > 1 || min(c1W_A1, na.rm = TRUE) < 0) {
+      warning("c1W_A1 predictions are outside of [0, 1] - sl3 library may be misconfigured.")
+    }
+    
+    # Check if we are within bounds for a [0, 1] prediction.
+    if (max(c1W_A0, na.rm = TRUE) > 1 || min(c1W_A0, na.rm = TRUE) < 0) {
+      warning("c1W_A0 predictions are outside of [0, 1] - sl3 library may be misconfigured.")
+    }
     
     pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
     
