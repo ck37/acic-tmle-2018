@@ -7,6 +7,7 @@ estimate_ate =
            treatment_field = "A",
            id_field = "id",
            prescreen = TRUE,
+           squared = TRUE,
            verbose = FALSE) {
     
   # Extract outcome variable
@@ -37,10 +38,12 @@ estimate_ate =
                                  outcome_vec = outcome_vec,
                                  treatment_vec = treatment_vec,
                                  prescreen = prescreen,
+                                 squared = squared,
                                  verbose = verbose)
   data_new = covar_result$data
-  covariate_df = covar_result$covariate_df
+  covariate_df = covar_result$covariate_dfY
   covariate_dfA = covar_result$covariate_dfA
+  covariate_dfC = covar_result$covariate_dfC
   
   # Combine elements back into one unified dataframe.
   # TODO: confirm this works correctly.
@@ -52,8 +55,9 @@ estimate_ate =
   colnames(data_new)[1:2] = c(outcome_field, treatment_field)
   
   # TODO: add censoring covariates.
-  covariate_fields = list("outcome" = names(covariate_df),
-                          "treatment" = names(covariate_dfA))
+  covariate_fields = list("outcome" = covariate_df,
+                          "treatment" = covariate_dfA,
+                          "censoring" = covariate_dfC)
   
   if (!is.null(tmle_wrapper)) {
     # We could have multiple versions of the tmle_wrapper function to try different approaches.

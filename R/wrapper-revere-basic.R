@@ -55,14 +55,18 @@ wrapper_revere_basic =
                                c(outcome_field, treatment_field, id_field))
     covariate_fieldsA = setdiff(colnames(data),
                                 c(outcome_field, treatment_field, id_field))
+    covariate_fieldsC = setdiff(colnames(data),
+                                c(outcome_field, treatment_field, id_field))
   }else{
     covariate_fieldsY = covariate_fields$outcome
     covariate_fieldsA = covariate_fields$treatment
+    covariate_fieldsC = covariate_fields$censoring
   }
   
   # Include treatment indicator in outcome regression.
   covariates_Q = c(treatment_field, covariate_fieldsY)
   covariates_g = covariate_fieldsA
+  covariates_c = covariate_fieldsC
     
   # Call revere basic, defined in R/revere_cvtmle_basic.R
   tmle_result =
@@ -71,6 +75,7 @@ wrapper_revere_basic =
                          treatment_field = treatment_field,
                          covariates_Q = covariates_Q, 
                          covariates_g = covariates_g,
+                         covariates_c = covariates_c,
                          # The Q stack will be re-used for g by default.
                          # Otherwise define lrnr_stack_g
                          lrnr_stack_Q = lrnr_stack_Q,
