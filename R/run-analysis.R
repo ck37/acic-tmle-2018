@@ -95,8 +95,10 @@ run_analysis =
     if (verbose) {
       cat("Observations:", prettyNum(nrow(analysis_data), big.mark = ","),
           "Treated pct:",
-          paste0(round(mean(analysis_data[[treatment_field]], na.rm = TRUE) * 100, 1),
-            "%"), "\n")
+          paste0(round(mean(analysis_data[[treatment_field]], na.rm = TRUE) * 100, 1), "%"),
+          "Censored pct:",
+          paste0(round(mean(is.na(analysis_data[[outcome_field]])) * 100, 1), "%"),
+          "\n")
     }
     
     # Run TMLE analysis.
