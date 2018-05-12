@@ -119,6 +119,7 @@ attr(startup, "packages_cran") = c(
   "glmnet",
   #"mgcv",
   "nnet",
+  "speedglm",
   "xgboost",
   "ranger"
 )
