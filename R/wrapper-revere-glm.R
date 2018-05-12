@@ -11,7 +11,7 @@ wrapper_revere_glm =
   # This function name would be passed into run_analyis() and would be
   # executed within R/estimate-ate.R
   if (verbose) {
-    cat("\nwrapper_revere_basic() - begin processing.\n")
+    cat("\nwrapper_revere_glm() - begin.\n")
   }
     
   ##############
