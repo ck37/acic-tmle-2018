@@ -37,7 +37,7 @@ run_analysis =
   
   # Check that input_file_covariates exists.
   if (!file.exists(input_file_covariates)) {
-    stop(paste("Counterfactual directory not found:", input_file_covariates))
+    stop(paste("Covariate file not found:", input_file_covariates))
   }
   
   # Import covariate dataset
