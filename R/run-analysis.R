@@ -64,7 +64,7 @@ run_analysis =
     ufid = gsub("^.*/([^./]+?)\\.csv$", "\\1", file, perl = TRUE)
     
     if (verbose) {
-      cat("Processing dataset", ufid, "\n")
+      cat("Processing dataset", ufid, "file", which(file == files), "of", length(files), "\n")
     }
     
     # Import one counterfactual file
