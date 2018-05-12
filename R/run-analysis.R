@@ -81,6 +81,13 @@ run_analysis =
     # Remove the sample_id from the data that we analyze.
     analysis_data[[id_field]] = NULL
     
+    if (verbose) {
+      cat("Observations:", prettyNum(nrow(analysis_data), big.mark = ","),
+          "Treated pct:",
+          paste0(round(mean(analysis_data[[treatment_field]], na.rm = TRUE) * 100, 1),
+            "%"), "\n")
+    }
+    
     # Run TMLE analysis.
     # Should return population ATE with inference, plus df of individual potential outcomes.
     # This function is defined in R/estimate-ate.R
