@@ -243,6 +243,7 @@ revere_cvtmle_basic =
         tmle::tmle(Y = y,
                    A = z,
                    W = W,
+                   Q = Q,
                    g1W = g1W,
                    family = "gaussian",
                    fluctuation = "logistic") 
