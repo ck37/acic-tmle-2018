@@ -31,7 +31,8 @@ wrapper_revere_basic =
   lrnr_stack_Q = make_learner(Stack,
                               lrnr_mean,
                               lrnr_glm, 
-                              lrnr_glmnet,
+                              # TODO: fix glmnet, is yielding warnings and not working.
+                              # lrnr_glmnet,
                               # TODO: increase java memory so we can use bartMachine
                               # lrnr_bartMachine,
                               # lrnr_dbarts,
