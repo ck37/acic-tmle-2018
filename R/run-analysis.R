@@ -2,6 +2,7 @@
 run_analysis =
   function(
     input_dir_counterfactuals = "data-raw/practice-censoring",
+    specific_files = NULL,
     # Inputs are all *.csvs that don't end in _cf.csv
     # This is a regex with a negative lookbehind.
     input_pattern = "(?<!_cf)\\.csv$",
@@ -62,6 +63,16 @@ run_analysis =
     
     # ufid = filename without the enclosing directory.
     ufid = gsub("^.*/([^./]+?)\\.csv$", "\\1", file, perl = TRUE)
+    
+    # Potentially limit to a set of ufids that were specified.
+    if (!is.null(specific_files)) {
+      if (!ufid %in% specific_files) {
+        if (verbose) {
+          cat("Skipping", ufid, "- not one of the specific files.\n")
+        }
+        next
+      }
+    }
     
     if (verbose) {
       cat("Processing dataset", ufid, "file", which(file == files), "of", length(files), "\n")
