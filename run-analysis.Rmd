@@ -36,6 +36,7 @@ results$revere =
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
     tmle_wrapper = wrapper_revere_basic,
+    # specific_files = c("d1546da12d8e4daf8fe6771e2187954d"),
     verbose = TRUE)
 # Now we have:
 # $ate - dataframe of ate estimates
