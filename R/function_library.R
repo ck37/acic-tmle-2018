@@ -115,6 +115,7 @@ attr(startup, "packages_cran") = c(
   # Machine learning.
   "bartMachine",
   "caret",
+  "grf",
   "glmnet",
   #"mgcv",
   "nnet",
@@ -130,6 +131,5 @@ attr(startup, "packages_github") = c(
   "ck37/ck37r",
   "jeremyrcoyle/gentmle2",
   "vdorie/dbarts",
-  "swager/grf",
   "jeremyrcoyle/delayed"
 )
