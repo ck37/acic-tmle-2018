@@ -6,6 +6,9 @@ clean_data_tmle =
            treatment_vec,
            prescreen,
            verbose = verbose) {
+    if (verbose) {
+      cat("\nclean_date_tmle() - begin processing.\n")
+    }
     
     # Remove constant columns from the covariate file.
     # NOTE: this won't work for factors, would need to use length(unique())
@@ -77,7 +80,7 @@ clean_data_tmle =
   # Separately for treatment and outcome
   if (prescreen) {
     if (verbose) {
-      cat("Prune covariates based on univariate association.\n")
+      cat("clean_data_tmle(): running prescreening code.\n")
     }
     
     # Identify non-binary variables (by index not name).
