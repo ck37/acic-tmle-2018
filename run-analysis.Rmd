@@ -6,8 +6,15 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 source("R/function_library.R")
+
+conf = list(
+  # Maximum amount of memory to allow rJava heap to use for bartMachine.
+  # Defaults to 16g but use options(java.mem = "20g") to change.
+  java_mem = getOption("java.mem", "16g")
+)
+
 # Load/install necessary packages.
-startup(auto_install = FALSE, verbose = TRUE)
+startup(auto_install = FALSE, verbose = TRUE, java_mem = conf$java_mem)
 # Load all .R files in R/
 ck37r::load_all_code("R")
 ```
@@ -15,13 +22,13 @@ ck37r::load_all_code("R")
 ## Configure analysis
 
 ```{r config}
-(conf = list(
+(conf = c(conf, list(
   input_dir_counterfactuals = "data-raw/practice-censoring",
   input_file_covariates = "data-raw/x.csv",
   output_file_ate = "exports/ate-test.csv",
   # IPO = Individual potential outcomes
-  output_dir_ipo = "exports/ipo-test"
-))
+  output_dir_ipo = "exports/ipo-test",
+)))
 
 results = list()
 ```
