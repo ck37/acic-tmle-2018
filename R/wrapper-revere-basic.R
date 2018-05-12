@@ -18,19 +18,25 @@ wrapper_revere_basic =
   # Define all the required elements to pass into revere_cvtmle_basic
   # This is based on revere_cvtmle_example.R
     
+  num_cores = RhpcBLASctl::get_num_cores()
+    
   lrnr_mean = make_learner(Lrnr_mean)
   lrnr_glm = make_learner(Lrnr_glm)
+  lrnr_glm_fast = make_learner(Lrnr_glm_fast)
   lrnr_glmnet = make_learner(Lrnr_glmnet)
   # Only exists in Jonathan's fork of sl3 - can't use this yet.
   # lrnr_bayesglm = make_learner(Lrnr_bayesglm)
-  lrnr_xgboost = make_learner(Lrnr_xgboost)$initialize(nrounds = 1000, eta = .01, nthread = 4)
+  lrnr_xgboost = make_learner(Lrnr_xgboost,
+                              nrounds = 1000, eta = .01,
+                              nthread = num_cores)
   lrnr_bartMachine = make_learner(Lrnr_bartMachine)
   lrnr_dbarts = make_learner(Lrnr_dbarts)
   lrnr_grf = make_learner(Lrnr_grf)
   
   lrnr_stack_Q = make_learner(Stack,
                               lrnr_mean,
-                              lrnr_glm, 
+                              #lrnr_glm, 
+                              lrnr_glm_fast, 
                               # TODO: fix glmnet, is yielding warnings and not working.
                               # lrnr_glmnet,
                               # TODO: increase java memory so we can use bartMachine
