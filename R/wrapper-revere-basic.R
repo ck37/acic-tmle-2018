@@ -4,6 +4,8 @@ wrapper_revere_basic =
            outcome_field = "y",
            treatment_field = "z",
            id_field = NULL,
+           # This is a list with elements "outcome" and "treatment".
+           # TODO: support "censoring".
            covariate_fields = NULL,
            verbose = FALSE) {
   # This function name would be passed into run_analyis() and would be
@@ -45,14 +47,16 @@ wrapper_revere_basic =
   metalearner_eval_Q = metalearner_linear
   metalearner_Q = make_learner(Lrnr_nnls)
   
+  # TODO: work on this section so that fewer variable names are created.
+  # It's somewhat duplicative/roundabout at the moment.
   if (is.null(covariate_fields)) {
     covariate_fieldsY = setdiff(colnames(data),
                                c(outcome_field, treatment_field, id_field))
     covariate_fieldsA = setdiff(colnames(data),
                                 c(outcome_field, treatment_field, id_field))
   }else{
-    covariate_fieldsY = covariate_fields$Y
-    covariate_fieldsA = covariate_fields$A
+    covariate_fieldsY = covariate_fields$outcome
+    covariate_fieldsA = covariate_fields$treatment
   }
   
   # Include treatment indicator in outcome regression.

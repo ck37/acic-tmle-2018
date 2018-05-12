@@ -52,7 +52,8 @@ estimate_ate =
   colnames(data_new)[1:2] = c(outcome_field, treatment_field)
   
   # TODO: add censoring covariates.
-  covariate_fields = list(Y=names(covariate_df), A=names(covariate_dfA))
+  covariate_fields = list("outcome" = names(covariate_df),
+                          "treatment" = names(covariate_dfA))
   
   if (!is.null(tmle_wrapper)) {
     # We could have multiple versions of the tmle_wrapper function to try different approaches.
