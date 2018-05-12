@@ -27,7 +27,7 @@ ck37r::load_all_code("R")
   input_file_covariates = "data-raw/x.csv",
   output_file_ate = "exports/ate-test.csv",
   # IPO = Individual potential outcomes
-  output_dir_ipo = "exports/ipo-test",
+  output_dir_ipo = "exports/ipo-test"
 )))
 
 results = list()
