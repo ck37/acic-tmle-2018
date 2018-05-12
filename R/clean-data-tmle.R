@@ -81,12 +81,14 @@ clean_data_tmle =
     }
     
     # Identify non-binary variables (by index not name).
-    #nonbinary_vars <- names(covars_df)[(apply(covars_df, 2, function(col_data) {
-    nonbinary_vars <- which(apply(covars_df, 2, function(col_data) {
+    # The ones that pass screening will have squared terms possibly added.
+    nonbinary_vars <- names(covars_df)[apply(covars_df, 2, function(col_data) {
+    #nonbinary_vars <- which(apply(covars_df, 2, function(col_data) {
       # Need to remove NAs from list, otherwise binary vars will be seen as
       # having 3 values if they have missing data.
       length(setdiff(unique(col_data), NA)) > 2L
-    }))
+    #}))
+    })]
     
     if (verbose) {
       cat("Found", (ncol(covars_df) - length(nonbinary_vars)), "binary and",
@@ -95,20 +97,24 @@ clean_data_tmle =
     
     # Identify covariate indices that meet a univariate correlation threshold
     # with the outcome variable, after adjusting for treatment status.
-    keep <- which(prescreen_uni(outcome_vec, treatment_vec, covars_df))
+    #keep <- which(prescreen_uni(outcome_vec, treatment_vec, covars_df))
+    keep <- colnames(covars_df)[prescreen_uni(outcome_vec, treatment_vec, covars_df)]
     if (verbose) {
       cat("Outcome correlation screening: selected", length(keep), "covars and",
           "removed", (ncol(covars_df) - length(keep)), "covars.\n")
     }
     # Identify covariates that meet a univariate correlation threshold
     # with the treatment indicator.
-    keepA <- which(prescreen_uniA(treatment_vec, covars_df))
+    #keepA <- which(prescreen_uniA(treatment_vec, covars_df))
+    keepA <- names(covars_df)[prescreen_uniA(treatment_vec, covars_df)]
     if (verbose) {
       cat("Treatment correlation screening: selected", length(keepA), "covars and",
           "removed", (ncol(covars_df) - length(keepA)), "covars.\n")
     }
     
     # TODO: what's going on here?
+    # CK: turning this off for now and reimplementing.
+    if (F) {
     keep.nonbinary <- data.frame(t(subset(t(nonbinary_vars), select = keep)))
     names(keep.nonbinary) <- "val"
     keep.nonbinaryA <- data.frame(t(subset(t(nonbinary_vars), select = keepA)))
@@ -120,11 +126,17 @@ clean_data_tmle =
     keep.nonbinary <- names(data.frame(covars_df)) %in% row.names(keep.nonbin_sub)
     keep.nonbin_subA <- subset(keep.nonbinaryA, val == "TRUE")
     keep.nonbinaryA <- names(data.frame(covars_df)) %in% row.names(keep.nonbin_subA)
+    } else {
+      keep.nonbinary = nonbinary_vars[nonbinary_vars %in% keep]
+      keep.nonbinaryA = nonbinary_vars[nonbinary_vars %in% keepA]
+    }
     
     # Outcome
     WsqY = NULL
     
-    if (length(which(keep.nonbinary)) > 0) {
+    #if (length(which(keep.nonbinary)) > 0) {
+    # CK: turning this off for now, needs to be reimplemented with comments.
+    if (FALSE && length(keep.nonbinary) > 0) {
       
       # TODO: what's going on here?
       new<-cbind.data.frame(names(data.frame(covars_df[, keep.nonbinary])),
@@ -144,7 +156,9 @@ clean_data_tmle =
     #Treatment
     WsqA = NULL
     
-    if (length(which(keep.nonbinaryA)) > 0) {
+    #if (length(which(keep.nonbinaryA)) > 0) {
+    # CK: turning this off for now, needs to be reimplemented with comments.
+    if (FALSE && length(which(keep.nonbinaryA)) > 0) {
       
       new<-cbind.data.frame(names(data.frame(covars_df[, keep.nonbinaryA])),
                             prescreen_uniA(treatment_vec, covars_df[, keep.nonbinaryA]^2, 
@@ -161,17 +175,30 @@ clean_data_tmle =
     }
     
     # Add squared terms to covars_df for Y
-    covars_dfY <- cbind(covars_df[, keep], WsqY)
+    # TODO: we should return column names, not copies of the full dataframe.
+    if (!is.null(WsqY)) {
+      covars_dfY <- cbind(covars_df[, keep], WsqY)
+    } else {
+      covars_dfY = covars_df[, keep]
+    }
     n.columns <- ncol(covars_dfY)
     
     # Add squared terms to covars_df for A
-    covars_dfA <- cbind(covars_df[, keepA], WsqA)
+    # TODO: we should return column names, not copies of the full dataframe.
+    if (!is.null(WsqA)) {
+      covars_dfA <- cbind(covars_df[, keepA], WsqA)
+    } else {
+      covars_dfA = covars_df[, keepA]
+    }
     n.columnsA <- ncol(covars_dfA)
     
     } else {
       if (verbose) cat("Keep all covariates. \n")
       
       # Add squared terms to X.
+      # TODO: we should remove collinear terms after this step, because esp. for
+      # binary variables this will create duplicate columns.
+      # Or just not add squared terms. Should be an argument to the function.
       covars_df<-cbind(covars_df, Wsq_all)
       n.columns <- ncol(covars_df)
       
@@ -181,6 +208,7 @@ clean_data_tmle =
   
   results = list(
     data = original,
+    # TODO: we should return column names, not copies of the full dataframe.
     covariate_dfY = covars_df,
     covariate_dfA = covars_dfA
     # TODO: add censoring covariates

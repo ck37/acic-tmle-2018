@@ -31,7 +31,7 @@ estimate_ate =
   # Preprocess covariate data before running TMLE. 
   # 1) Remove linearly correlated columns
   # 2) Keeps covariates with univariate associations
-  # 3) Adds square terms
+  # 3) Adds square terms (temporarily disabled; TODO: fix this)
   # 4) Remove constant columns from the covariate file.
   covar_result = clean_data_tmle(covars_df = covariate_df,
                                  outcome_vec = outcome_vec,
