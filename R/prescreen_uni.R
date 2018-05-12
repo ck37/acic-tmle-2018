@@ -31,7 +31,8 @@ prescreen_uni <- function(Y, A, X, alpha = .05, min = 5, ...) {
   
   # Select covariates that meet the correlation p-value threshold.
   keep_bools <- pvalues <= alpha
-  if (sum(keep_bools) < min) {
+  # Handle NAs even though we should not have any.
+  if (sum(keep_bools, na.rm = TRUE) < min) {
     # If we don't have enough covariates ensure that we at least
     # keep the minimum number.
     keep_bools[order(pvalues)[1:min]] <- TRUE
@@ -55,7 +56,9 @@ prescreen_uniA <- function(A, X, alpha = .05, min = 5, ...){
     }
   }
   keep <- pvalues <= alpha
-  if(sum(keep) < min){
+  # For one dataset we are getting NAs in keep, unclear why.
+  if (sum(keep, na.rm = TRUE) < min) {
+    # Any NAs will go to the end of order.
     keep[order(pvalues)[1:min]] <- TRUE
   }
   return(keep)
