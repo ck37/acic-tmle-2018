@@ -157,15 +157,15 @@ revere_cvtmle_basic =
   
   if (any(C==1)) {
     # fit on folds and predict on subsetted folds for g and c
-    c1W_task = make_sl3_Task(data = data, covariates = covariates_Q,
+    c1W_task = make_sl3_Task(data = data, covariates = covariates_c,
                              outcome = censor_field,
                              folds = folds)
     
     # need to fit for A=1 and for A=0 so we make these tasks
-    c1W_taskA1 = make_sl3_Task(data = dataQ1W, covariates = covariates_Q,
+    c1W_taskA1 = make_sl3_Task(data = dataQ1W, covariates = covariates_c,
                                outcome = censor_field,
                                folds = folds)
-    c1W_taskA0 = make_sl3_Task(data = dataQ0W, covariates = covariates_Q,
+    c1W_taskA0 = make_sl3_Task(data = dataQ0W, covariates = covariates_c,
                                outcome = censor_field,
                                folds = folds)
     
