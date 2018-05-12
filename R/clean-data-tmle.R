@@ -81,9 +81,15 @@ clean_data_tmle =
   original <- cbind(original, Wsq_all)
   n.columns <- ncol(original)
   
-  #Create censoring variable based on the outcome
-  C <- rep(0, length(outcome_vec))
-  C[is.na(outcome_vec)]<-1
+  # Create censoring variable based on the outcome.
+  C = as.integer(is.na(outcome_vec))
+  
+  # Skip censoring if every outcome is defined.
+  if (sum(is.na(outcome_vec)) == 0L) {
+    skip_censoring = TRUE
+  } else {
+    skip_censoring = FALSE
+  }
 
   # Optional prescreening
   # Separately for treatment and outcome
@@ -123,12 +129,15 @@ clean_data_tmle =
           "removed", (ncol(covars_df) - length(keepA)), "covars.\n")
     }
     
-    # Identify covariates that meet a univariate correlation threshold
-    # with the censoring indicator.
-    keepC <- names(covars_df)[prescreen_uniA(C, covars_df)]
-    if (verbose) {
-      cat("Censoring correlation screening: selected", length(keepC), "covars and",
-          "removed", (ncol(covars_df) - length(keepC)), "covars.\n")
+    if (!skip_censoring) {
+      # Identify covariates that meet a univariate correlation threshold
+      # with the censoring indicator.
+      keepC <- names(covars_df)[prescreen_uniA(C, covars_df)]
+      
+      if (verbose) {
+        cat("Censoring correlation screening: selected", length(keepC), "covars and",
+            "removed", (ncol(covars_df) - length(keepC)), "covars.\n")
+      }
     }
     
     #Optional: add squared terms to Y, A, C
@@ -137,7 +146,9 @@ clean_data_tmle =
       #Among the variables we keep for Y, A, C separate non-binary covariates 
       keep.nonbinaryY <- keepY[keepY %in% nonbinary_vars]
       keep.nonbinaryA <- keepA[keepA %in% nonbinary_vars]
-      keep.nonbinaryC <- keepC[keepC %in% nonbinary_vars]
+      if (!skip_censoring) {
+        keep.nonbinaryC <- keepC[keepC %in% nonbinary_vars]
+      }
       
       #Create square terms for non-binary covariates for Y, A, C
       WsqY = NULL
@@ -155,7 +166,7 @@ clean_data_tmle =
         colnames(WsqA) <- paste0(colnames(WsqA), "sq")
       } 
       
-      if(length(keep.nonbinaryC) > 0){
+      if (!skip_censoring && length(keep.nonbinaryC) > 0) {
         WsqC <- covars_df[, keep.nonbinaryC, drop = FALSE]^2
         colnames(WsqC) <- paste0(colnames(WsqC), "sq")
       } 
@@ -176,40 +187,50 @@ clean_data_tmle =
       }
       n.columnsA <- ncol(covars_dfA)
       
-      # Add squared terms to covars_df for C
-      # TODO: we should return column names, not copies of the full dataframe.
-      if (!is.null(WsqC)) {
-        covars_dfC <- cbind(covars_df[, keepC], WsqC)
-      } else {
-        covars_dfC = covars_df[, keepC]
+      if (!skip_censoring) {
+        # Add squared terms to covars_df for C
+        # TODO: we should return column names, not copies of the full dataframe.
+        if (!is.null(WsqC)) {
+          covars_dfC <- cbind(covars_df[, keepC], WsqC)
+        } else {
+          covars_dfC = covars_df[, keepC]
+        }
+        n.columnsC <- ncol(covars_dfC)
       }
-      n.columnsC <- ncol(covars_dfC)
 
     }
     
-    } else {
-      if (verbose) cat("Keep all covariates. \n")
+  } else {
+    if (verbose) cat("Keep all covariates. \n")
+    
+    # Add squared terms to X.
+    if (squared) {
       
-      # Add squared terms to X.
-      if(squared){
-        
-        if (verbose) cat("Adding squared terms. \n")
-        
-        covars_dfY<-cbind(covars_df, Wsq_all)
-        n.columns <- ncol(covars_dfY)
-        
-        covars_dfA<-cbind(covars_df, Wsq_all)
-        n.columnsA <- ncol(covars_dfA)
-        
-        covars_dfC<-cbind(covars_df, Wsq_all)
+      if (verbose) cat("Adding squared terms.\n")
+      
+      covars_dfY <- cbind(covars_df, Wsq_all)
+      n.columns <- ncol(covars_dfY)
+      
+      covars_dfA <- cbind(covars_df, Wsq_all)
+      n.columnsA <- ncol(covars_dfA)
+      
+      if (!skip_censoring) {
+        covars_dfC <- cbind(covars_df, Wsq_all)
         n.columnsC <- ncol(covars_dfC)
-      }else{
-        covars_dfY<-covars_df
-        covars_dfA<-covars_df
-        covars_dfC<-covars_df
       }
-      
-    } 
+    } else {
+      covars_dfY <- covars_df
+      covars_dfA <- covars_df
+      if (!skip_censoring) {
+        covars_dfC <- covars_df
+      }
+    }
+    
+  } 
+  
+  if (skip_censoring) {
+    covars_dfC = NULL
+  }
   
   results = list(
     data = original,
