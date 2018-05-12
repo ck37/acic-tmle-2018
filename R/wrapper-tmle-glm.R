@@ -1,5 +1,5 @@
 # This will setup the estimator, call it, then send results back to estimate_ate.R
-wrapper_tmle = 
+wrapper_tmle_glm = 
   function(data,
            outcome_field = "y",
            treatment_field = "z",
@@ -9,7 +9,7 @@ wrapper_tmle =
   # This function name would be passed into run_analyis() and would be
   # executed within R/estimate-ate.R
   if (verbose) {
-    cat("Running wrapper_tmle().\n")
+    cat("Running wrapper_tmle_glm().\n")
   }
   
   ##############
