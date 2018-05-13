@@ -30,7 +30,11 @@ options(sl3.verbose = TRUE)
 
 results = list()
 
-# TODO: setup multi-node parallelization
+# Setup multi-node parallelization
+nodes = strsplit(Sys.getenv("SLURM_NODELIST"), ",")[[1]] 
+cat("Nodes:", paste(nodes, collapse = ", "), "\n")
+#plan(list(tweak(cluster, workers = nodes), multiprocess))
+#plan(list(tweak(future::cluster, workers = nodes)))
 
 #####################################
 ## @knitr analysis_revere_glm
