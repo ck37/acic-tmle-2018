@@ -54,6 +54,12 @@ ifndef SBATCH_QOS
 	#SBATCH_QOS=savio_lowprio
 endif
 
+# Partition is only used on Savio.
+# See http://research-it.berkeley.edu/services/high-performance-computing/user-guide/savio-user-guide#Scheduler
+ifndef SAVIO_PARTITION
+  SAVIO_PARTITION=savio2
+endif
+
 ########################################
 # Execution engines.
 
@@ -61,8 +67,8 @@ SBATCH = sbatch
 
 # BRC uses account and QOS but Comet does not.
 ifeq (${hpc_system}, savio)
-  # Specify account and QOS.
-	SBATCH := ${SBATCH} -A ${SBATCH_ACCOUNT} --qos ${SBATCH_QOS}
+  # Specify account, QOS, and partition.
+	SBATCH := ${SBATCH} -A ${SBATCH_ACCOUNT} --qos ${SBATCH_QOS} --partition ${SAVIO_PARTITION}
 endif
 ifeq (${HPC_SYSTEM},bridges)
 	# Comet & Bridges want us to specify tasks per node I think.
@@ -116,8 +122,9 @@ else
 endif
 
 # Start a bash session with 2 nodes, for up to 12 hours.
+# TODO: support non-Savio execution.
 bash:
-	srun -A ${ACCOUNT} -p ${PARTITION} -N 2 -t 12:00:00 --pty bash
+	srun -A ${ACCOUNT} -p ${SAVIO_PARTITION} -N 2 -t 12:00:00 --pty bash
 
 # Next line ensures that this rule works even if there's a file named "clean".
 .PHONY : clean
