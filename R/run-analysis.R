@@ -82,10 +82,13 @@ run_analysis =
     
     # Import one counterfactual file
     # Column names are sample_id, z (treatment), and y (outcome)
-    if (file.exists(file)) {
-      cf = rio::import(file)
+    # Add full path to help parallelization on savio.
+    # TODO: create a load_datasets() that is separate from run_analysis()
+    full_file = paste0(here::here(), "/", file)
+    if (file.exists(full_file)) {
+      cf = rio::import(full_file)
     } else {
-      stop(paste("Can't find file:", file))
+      stop(paste("Can't find file:", full_file, "\nPwd:", getwd()))
     }
     
     # Merge into single dataset
