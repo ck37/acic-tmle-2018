@@ -82,7 +82,11 @@ run_analysis =
     
     # Import one counterfactual file
     # Column names are sample_id, z (treatment), and y (outcome)
-    cf = rio::import(file)
+    if (file.exists(file)) {
+      cf = rio::import(file)
+    } else {
+      stop(paste("Can't find file:", file))
+    }
     
     # Merge into single dataset
     data = merge(cf, covariate_df, by.x = id_field, by.y = id_field,
