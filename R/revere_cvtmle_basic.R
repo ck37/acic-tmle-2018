@@ -106,9 +106,16 @@ revere_cvtmle_basic =
   z = data[[treatment_field]]
   y_sub = y[subset_index]
   
+  if (all(unique(y) %in% c(0, 1, NA))) {
+    outcome_type_q = "binomial"
+  } else {
+    outcome_type_q = "gaussian"
+  }
+  
   # fit the metalearner and get coefs to be used later
   Z_Q = make_sl3_Task(data = cbind(y = y_sub, QAW_stack_sub), 
                       covariates = names(QAW_stack_sub),
+                      outcome_type = outcome_type_q,
                       outcome = outcome_field)
   Qfit = metalearner_Q$train(Z_Q)
   coefQ = Qfit$coefficients
@@ -142,6 +149,7 @@ revere_cvtmle_basic =
   g1W_task = make_sl3_Task(data = data,
                            covariates = covariates_g,
                            outcome = treatment_field,
+                           outcome_type = "binomial",
                            folds = folds)
   
   # fit on training folds
@@ -174,18 +182,21 @@ revere_cvtmle_basic =
     warning("g1W predictions are outside of [0, 1] - sl3 library may be misconfigured.")
   }
   
-  if (any(C==1)) {
+  if (any(C == 1)) {
     # fit on folds and predict on subsetted folds for g and c
     c1W_task = make_sl3_Task(data = data, covariates = covariates_c,
                              outcome = censor_field,
+                             outcome_type = "binomial",
                              folds = folds)
     
     # need to fit for A=1 and for A=0 so we make these tasks
     c1W_taskA1 = make_sl3_Task(data = dataQ1W, covariates = covariates_c,
                                outcome = censor_field,
+                               outcome_type = "binomial",
                                folds = folds)
     c1W_taskA0 = make_sl3_Task(data = dataQ0W, covariates = covariates_c,
                                outcome = censor_field,
+                               outcome_type = "binomial",
                                folds = folds)
     
     # fit on the training sets
@@ -218,14 +229,23 @@ revere_cvtmle_basic =
     c1W_A1 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA1))
     c1W_A0 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA0))
     
+    # CK: these are not bounded by [0, 1], need to manually bound.
+    # TODO: figure out what's going onto yield binomial predictions outside of [0, 1].
+    c1W_A1 = bound(c1W_A1, c(0, 1))
+    c1W_A0 = bound(c1W_A0, c(0, 1))
+    
     # Check if we are within bounds for a [0, 1] prediction.
     if (max(c1W_A1, na.rm = TRUE) > 1 || min(c1W_A1, na.rm = TRUE) < 0) {
-      warning("c1W_A1 predictions are outside of [0, 1] - sl3 library may be misconfigured.")
+      warning(paste0("c1W_A1 predictions are outside of [0, 1] - sl3 library may be misconfigured.",
+                     "Max:", max(c1W_A1, na.rm = TRUE),
+                     "Min:", min(c1W_A1, na.rm = TRUE)))
     }
     
     # Check if we are within bounds for a [0, 1] prediction.
     if (max(c1W_A0, na.rm = TRUE) > 1 || min(c1W_A0, na.rm = TRUE) < 0) {
-      warning("c1W_A0 predictions are outside of [0, 1] - sl3 library may be misconfigured.")
+      warning(paste0("c1W_A0 predictions are outside of [0, 1] - sl3 library may be misconfigured.",
+                     "Max:", max(c1W_A0, na.rm = TRUE),
+                     "Min:", min(c1W_A0, na.rm = TRUE)))
     }
     
     pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
