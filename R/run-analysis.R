@@ -98,6 +98,10 @@ run_analysis =
           paste0(round(mean(analysis_data[[treatment_field]], na.rm = TRUE) * 100, 1), "%"),
           "Censored pct:",
           paste0(round(mean(is.na(analysis_data[[outcome_field]])) * 100, 1), "%"),
+          "\nOutcome bounds:", round(c(min(analysis_data[[outcome_field]], na.rm = TRUE),
+                               max(analysis_data[[outcome_field]], na.rm = TRUE)), 2),
+          "Treatment bounds:", round(c(min(analysis_data[[treatment_field]], na.rm = TRUE),
+                               max(analysis_data[[treatment_field]], na.rm = TRUE)), 2),
           "\n")
     }
     
@@ -111,6 +115,10 @@ run_analysis =
                                tmle_wrapper = tmle_wrapper,
                                prescreen = prescreen,
                                verbose = verbose)
+    
+    # Put sample_id back in the ipo data frame (required in exported file)
+    tmle_result$ipo_df = cbind(data[[id_field]], tmle_result$ipo_df)
+    names(tmle_result$ipo_df)[1] = "sample_id"
     
     # Put estimates into a list for rbinding into a dataframe.
     ate_result = cbind.data.frame(ufid = ufid, 

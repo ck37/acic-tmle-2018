@@ -106,9 +106,16 @@ revere_cvtmle_basic =
   z = data[[treatment_field]]
   y_sub = y[subset_index]
   
+  if (all(unique(y) %in% c(0, 1, NA))) {
+    outcome_type_q = "binomial"
+  } else {
+    outcome_type_q = "gaussian"
+  }
+  
   # fit the metalearner and get coefs to be used later
   Z_Q = make_sl3_Task(data = cbind(y = y_sub, QAW_stack_sub), 
                       covariates = names(QAW_stack_sub),
+                      outcome_type = outcome_type_q,
                       outcome = outcome_field)
   Qfit = metalearner_Q$train(Z_Q)
   coefQ = Qfit$coefficients
@@ -117,6 +124,28 @@ revere_cvtmle_basic =
   QAW = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(QAW_task)))
   Q1W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q1W_task)))
   Q0W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q0W_task)))
+  
+  
+  # Explicitly bound to observed outcome bounds.
+  y_bounds = c(min(y_sub), max(y_sub))
+  QAW = bound(QAW, y_bounds)
+  Q1W = bound(Q1W, y_bounds)
+  Q0W = bound(Q0W, y_bounds)
+  
+  if (max(QAW, na.rm = TRUE) > max(y, na.rm = TRUE) ||
+      min(QAW, na.rm = TRUE) < min(y, na.rm = TRUE)) {
+    warning("QAW predictions are outside of Y bounds - sl3 library may be misconfigured.")
+  }
+  
+  if (max(Q1W, na.rm = TRUE) > max(y, na.rm = TRUE) ||
+      min(Q1W, na.rm = TRUE) < min(y, na.rm = TRUE)) {
+    warning("Q1W predictions are outside of Y bounds - sl3 library may be misconfigured.")
+  }
+  
+  if (max(Q0W, na.rm = TRUE) > max(y, na.rm = TRUE) ||
+      min(Q0W, na.rm = TRUE) < min(y, na.rm = TRUE)) {
+    warning("Q1W predictions are outside of Y bounds - sl3 library may be misconfigured.")
+  }
   
   # setting censored outcomes to NA because that's how they should be coded in reality'
   y[C == 1] = NA
@@ -127,6 +156,7 @@ revere_cvtmle_basic =
   g1W_task = make_sl3_Task(data = data,
                            covariates = covariates_g,
                            outcome = treatment_field,
+                           outcome_type = "binomial",
                            folds = folds)
   
   # fit on training folds
@@ -155,18 +185,29 @@ revere_cvtmle_basic =
   # stacked val set preds on very close to new data
   g1W = metalearner_eval_g(coefg, as.matrix(g1W_stack))
   
-  if (any(C==1)) {
+  # Manually bound g1W, is not staying within [0, 1]
+  # TODO: investigate why and remove the need to bound it.
+  g1W = bound(g1W, c(0, 1))
+  
+  if (max(g1W, na.rm = TRUE) > 1 || min(g1W, na.rm = TRUE) < 0) {
+    warning("g1W predictions are outside of [0, 1] - sl3 library may be misconfigured.")
+  }
+  
+  if (any(C == 1)) {
     # fit on folds and predict on subsetted folds for g and c
     c1W_task = make_sl3_Task(data = data, covariates = covariates_c,
                              outcome = censor_field,
+                             outcome_type = "binomial",
                              folds = folds)
     
     # need to fit for A=1 and for A=0 so we make these tasks
     c1W_taskA1 = make_sl3_Task(data = dataQ1W, covariates = covariates_c,
                                outcome = censor_field,
+                               outcome_type = "binomial",
                                folds = folds)
     c1W_taskA0 = make_sl3_Task(data = dataQ0W, covariates = covariates_c,
                                outcome = censor_field,
+                               outcome_type = "binomial",
                                folds = folds)
     
     # fit on the training sets
@@ -198,6 +239,25 @@ revere_cvtmle_basic =
     # 1 minus to get probability of being observed for both A=1 and A=0 obs
     c1W_A1 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA1))
     c1W_A0 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA0))
+    
+    # CK: these are not bounded by [0, 1], need to manually bound.
+    # TODO: figure out what's going onto yield binomial predictions outside of [0, 1].
+    c1W_A1 = bound(c1W_A1, c(0, 1))
+    c1W_A0 = bound(c1W_A0, c(0, 1))
+    
+    # Check if we are within bounds for a [0, 1] prediction.
+    if (max(c1W_A1, na.rm = TRUE) > 1 || min(c1W_A1, na.rm = TRUE) < 0) {
+      warning(paste0("c1W_A1 predictions are outside of [0, 1] - sl3 library may be misconfigured.",
+                     "Max:", max(c1W_A1, na.rm = TRUE),
+                     "Min:", min(c1W_A1, na.rm = TRUE)))
+    }
+    
+    # Check if we are within bounds for a [0, 1] prediction.
+    if (max(c1W_A0, na.rm = TRUE) > 1 || min(c1W_A0, na.rm = TRUE) < 0) {
+      warning(paste0("c1W_A0 predictions are outside of [0, 1] - sl3 library may be misconfigured.",
+                     "Max:", max(c1W_A0, na.rm = TRUE),
+                     "Min:", min(c1W_A0, na.rm = TRUE)))
+    }
     
     pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
     

@@ -6,8 +6,15 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 source("R/function_library.R")
+
+conf = list(
+  # Maximum amount of memory to allow rJava heap to use for bartMachine.
+  # Defaults to 16g but use options(java.mem = "20g") to change.
+  java_mem = getOption("java.mem", "16g")
+)
+
 # Load/install necessary packages.
-startup(auto_install = FALSE, verbose = TRUE)
+startup(auto_install = FALSE, verbose = TRUE, java_mem = conf$java_mem)
 # Load all .R files in R/
 ck37r::load_all_code("R")
 ```
@@ -15,13 +22,13 @@ ck37r::load_all_code("R")
 ## Configure analysis
 
 ```{r config}
-(conf = list(
+(conf = c(conf, list(
   input_dir_counterfactuals = "data-raw/practice-censoring",
   input_file_covariates = "data-raw/x.csv",
   output_file_ate = "exports/ate-test.csv",
   # IPO = Individual potential outcomes
   output_dir_ipo = "exports/ipo-test"
-))
+)))
 
 results = list()
 ```
@@ -29,8 +36,6 @@ results = list()
 ## Analysis: revere
 
 ```{r analysis_revere}
-
-# Generate analyses
 results$revere =
   run_analysis(
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
@@ -38,11 +43,6 @@ results$revere =
     tmle_wrapper = wrapper_revere_basic,
     # specific_files = c("d1546da12d8e4daf8fe6771e2187954d"),
     verbose = TRUE)
-# Now we have:
-# $ate - dataframe of ate estimates
-# $ipos - list with individual potential outcome estimates for each file.
-# $cf_files - vector of files to use for evaluating our estimates. 
-names(results$revere)
 ```
 
 ## Evaluate: revere
@@ -55,37 +55,121 @@ if (exists("results") && "revere" %in% names(results) &&
   stats = evaluate_estimates(results$revere, verbose = TRUE)
   print(stats)
   save(results, stats,
-       file = "data/revere-results-stats.RData")
+       file = "data/results-stats-revere.RData")
 }
 ```
+
+25% coverage :(
+
+## Analysis: revere glm
+
+Revere with only GLM + mean as learners.
+
+```{r analysis_revere_glm}
+
+# Generate analyses
+results$revere_glm =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_revere_glm,
+    verbose = TRUE)
+```
+
+## Evaluate: revere glm
+
+Evaluate our estimates if we have counterfactual files.
+
+```{r eval_revere_glm}
+if (exists("results") && "revere_glm" %in% names(results) &&
+    "cf_files" %in% names(results$revere_glm) && length(results$revere_glm$cf_files) > 0L) {
+  stats = evaluate_estimates(results$revere_glm, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-revere-glm.RData")
+}
+```
+
+58% coverage!
+
+## Analysis: revere glmnet
+
+Revere with only glmnet + glm + mean as learners.
+
+```{r analysis_revere_glmnet}
+results$revere_glmnet =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_revere_glmnet,
+    verbose = TRUE)
+```
+
+## Evaluate: revere glmnet
+
+Evaluate our estimates if we have counterfactual files.
+
+```{r eval_revere_glm}
+if (exists("results") && "revere_glmnet" %in% names(results) &&
+    "cf_files" %in% names(results$revere_glmnet) && length(results$revere_glmnet$cf_files) > 0L) {
+  stats = evaluate_estimates(results$revere_glmnet, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-revere-glmnet.RData")
+}
+```
+
+## Analysis: tmle-glm
+
+```{r analysis_tmle_glm}
+results$tmle_glm =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_tmle_glm,
+    # Need to do stratified cross-validation. Should fit SL outside of tmle.
+    #specific_files = c("9333a461d3944d089ef60cdf3b88fd40"),
+    verbose = TRUE)
+```
+
+## Evaluate: tmle-glm
+
+```{r eval_tmle_glm}
+if (exists("results") && "tmle_glm" %in% names(results) &&
+    "cf_files" %in% names(results$tmle_glm) && length(results$tmle_glm$cf_files) > 0L) {
+  stats = evaluate_estimates(results$tmle_glm, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-tmle-glm.RData")
+}
+```
+
+Coverage: 33%
+
+Note that file 10 is very far off on its ATE estimate, and that's the file that has no censoring. Need to investigate.
 
 ## Analysis: tmle
 
 ```{r analysis_tmle}
-
-# Generate analyses
-results_tmle =
+results$tmle =
   run_analysis(
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
-    #tmle_wrapper = wrapper_tmle,
     tmle_wrapper = wrapper_tmle_better,
+    # Need to do stratified cross-validation. Should fit SL outside of tmle.
+    #specific_files = c("9333a461d3944d089ef60cdf3b88fd40"),
     verbose = TRUE)
-# Now we have:
-# $ate - dataframe of ate estimates
-# $ipos - list with individual potential outcome estimates for each file.
-# $cf_files - vector of files to use for evaluating our estimates. 
-names(results_tmle)
 ```
 
 ## Evaluate: tmle
 
-Evaluate our estimates if we have counterfactual files.
-
-```{r eval_estimates}
-if (exists("results_tmle") && "cf_files" %in% names(results_tmle) && length(results_tmle$cf_files) > 0L) {
-  stats = evaluate_estimates(results_tmle, verbose = TRUE)
+```{r eval_tmle}
+if (exists("results") && "tmle" %in% names(results) &&
+    "cf_files" %in% names(results$tmle) && length(results$tmle$cf_files) > 0L) {
+  stats = evaluate_estimates(results$tmle, verbose = TRUE)
   print(stats)
+  save(results, stats,
+       file = "data/results-stats-tmle.RData")
 }
 ```
 

@@ -6,9 +6,16 @@ clean_data_tmle =
            treatment_vec,
            prescreen,
            squared,
+           alpha_level = .2,
            verbose = verbose) {
     if (verbose) {
       cat("\nclean_date_tmle() - begin processing.\n")
+    }
+    
+    # Check for missing valuesin covars_df
+    total_missing_values = sum(is.na(covars_df))
+    if (verbose) {
+      cat("Total missing values in covars_df:", total_missing_values, "\n")
     }
     
     # Remove constant columns from the covariate file.
@@ -18,7 +25,7 @@ clean_data_tmle =
     # even if the covariate should actually be a factor (ex, race)
     constant_columns = which(apply(covars_df, MARGIN = 2L, var) == 0)
     
-    if(length(constant_columns) > 0) {
+    if (length(constant_columns) > 0) {
       covars_df = covars_df[, -constant_columns, drop = FALSE]
     }
     
@@ -42,8 +49,7 @@ clean_data_tmle =
     }
     
     # Make sure we don't switch to a vector if only 1 column remains.
-    # Subtract 1L because y is the first column in the caret analysis.
-    covars_df = covars_df[, !colnames(covars_df) %in% colnames(covars_df)[linear_combos$remove - 1L], 
+    covars_df = covars_df[, !colnames(covars_df) %in% colnames(covars_df)[linear_combos$remove], 
                           drop = FALSE]
     if (verbose) {
       cat("Updated covariate count:", ncol(covars_df), "\n")
@@ -115,7 +121,8 @@ clean_data_tmle =
     
     # Identify covariate indices that meet a univariate correlation threshold
     # with the outcome variable, after adjusting for treatment status.
-    keepY <- colnames(covars_df)[prescreen_uni(outcome_vec, treatment_vec, covars_df)]
+    keepY <- colnames(covars_df)[prescreen_uni(outcome_vec, treatment_vec, covars_df, 
+              alpha = alpha_level)]
     if (verbose) {
       cat("Outcome correlation screening: selected", length(keepY), "covars and",
           "removed", (ncol(covars_df) - length(keepY)), "covars.\n")
@@ -123,7 +130,7 @@ clean_data_tmle =
     
     # Identify covariates that meet a univariate correlation threshold
     # with the treatment indicator.
-    keepA <- names(covars_df)[prescreen_uniA(treatment_vec, covars_df)]
+    keepA <- names(covars_df)[prescreen_uniA(treatment_vec, covars_df, alpha = alpha_level)]
     if (verbose) {
       cat("Treatment correlation screening: selected", length(keepA), "covars and",
           "removed", (ncol(covars_df) - length(keepA)), "covars.\n")
@@ -132,7 +139,7 @@ clean_data_tmle =
     if (!skip_censoring) {
       # Identify covariates that meet a univariate correlation threshold
       # with the censoring indicator.
-      keepC <- names(covars_df)[prescreen_uniA(C, covars_df)]
+      keepC <- names(covars_df)[prescreen_uniA(C, covars_df, alpha = alpha_level)]
       
       if (verbose) {
         cat("Censoring correlation screening: selected", length(keepC), "covars and",

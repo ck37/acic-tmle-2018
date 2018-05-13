@@ -74,7 +74,7 @@ estimate_ate =
            ci_left = tmle_result$ci_left,
            ci_right = tmle_result$ci_right,
            # Dataframe of individual potential outcomes.
-           ipo_df = tmle_result$potential_outcomes)
+           ipo_df = tmle_result$ipo_df)
   }
   
   if (is.null(tmle_wrapper) || !exists("results")) {
