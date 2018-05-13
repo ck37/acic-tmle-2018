@@ -178,7 +178,7 @@ if (exists("results") && "tmle" %in% names(results) &&
 ```{r create_output}
 output_files =
   create_output_files(
-    results,
+    results$revere,
     output_file_ate = conf$output_file_ate,
     output_dir_ipo = conf$output_dir_ipo,
     verbose = TRUE)
