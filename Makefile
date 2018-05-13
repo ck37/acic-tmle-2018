@@ -33,6 +33,7 @@ ifeq ($(findstring bridges,$(shell uname -n)),bridges)
 endif
 # TODO: get comet working
 # hpc_system="comet"
+$(info Detected hpc system: ${HPC_SYSTEM})
 
 ########################################
 # Savio configuration.
@@ -66,7 +67,7 @@ endif
 SBATCH = sbatch
 
 # BRC uses account and QOS but Comet does not.
-ifeq (${hpc_system}, savio)
+ifeq (${HPC_SYSTEM}, savio)
   # Specify account, QOS, and partition.
 	SBATCH := ${SBATCH} -A ${SBATCH_ACCOUNT} --qos ${SBATCH_QOS} --partition ${SAVIO_PARTITION}
 endif
@@ -74,7 +75,7 @@ ifeq (${HPC_SYSTEM},bridges)
 	# Comet & Bridges want us to specify tasks per node I think.
 	SBATCH := ${SBATCH} --ntasks-per-node=14
 endif
-ifeq (${hpc_system}, comet)
+ifeq (${HPC_SYSTEM}, comet)
 	# Comet & Bridges want us to specify tasks per node I think.
 	SBATCH := ${SBATCH} --ntasks-per-node=24
 endif
