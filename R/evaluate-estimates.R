@@ -41,18 +41,17 @@ evaluate_estimates = function(results, verbose = FALSE) {
                  ci_left = our_estimate$li,
                  ci_right = our_estimate$ri,
                  mse = est_mse,
-                 ci_covers_true_ate = ci_covers_true_ate)
+                 ci_covers = ci_covers_true_ate)
     
     # Compile into a dataframe.
     stats = rbind.data.frame(stats, result, stringsAsFactors = FALSE)
   }
   
   if (verbose) {
-    cat("Coverage:", paste0(round(mean(stats$ci_covers_true_ate) * 100, 1), "%"),
-        "Average MSE:", round(mean(stats$mse), 3), "\n")
+    cat("Coverage:", paste0(round(mean(stats$ci_covers) * 100, 1L), "%"),
+        "Average MSE:", round(mean(stats$mse), 3L), "\n")
   }
   
   # Compile and return results.
-  # TODO: possibly return more info.
   return(stats)
 }
