@@ -34,7 +34,7 @@ results = list()
 nodes = strsplit(Sys.getenv("SLURM_NODELIST"), ",")[[1]] 
 cat("Nodes:", paste(nodes, collapse = ", "), "\n")
 #plan(list(tweak(cluster, workers = nodes), multiprocess))
-#plan(list(tweak(future::cluster, workers = nodes)))
+plan(list(tweak(future::cluster, workers = nodes, revtunnel = FALSE)))
 
 #####################################
 ## @knitr analysis_revere_glm
