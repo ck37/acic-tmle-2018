@@ -54,7 +54,12 @@ run_analysis =
   cat("\nBegin processing factual datasets.\n")
   
   # for (file in files) {
-  estimation_results = future.apply::future_lapply(files, function(file) {
+  estimation_results = future.apply::future_lapply(files,
+  # Ensure that workers have all relevant libraries available.
+  # TODO: add github packages (may need a helper function)
+    future.packages = attr(startup, "packages_cran"),
+    # future.globals = c("aorder"),
+    FUN = function(file) {
     # Measure the execution time needed to analyze each file.
     time_start = proc.time()
     
