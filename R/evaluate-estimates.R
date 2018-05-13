@@ -19,7 +19,7 @@ evaluate_estimates = function(results, verbose = FALSE) {
     # V1 appears to be an unncessary rownames column
     cf = rio::import(file)
     
-    cf_ate = mean(cf$y1, na.rm=TRUE) - mean(cf$y0,na.rm=TRUE)
+    cf_ate = mean(cf$y1, na.rm = TRUE) - mean(cf$y0, na.rm = TRUE)
     
     our_estimate = results$ate[results$ate$ufid == ufid, , drop = FALSE]
   
@@ -35,9 +35,13 @@ evaluate_estimates = function(results, verbose = FALSE) {
     
     # Save result.
     result =
-      list(ufid = ufid,
-           mse = est_mse,
-           ci_covers_true_ate = ci_covers_true_ate)
+      data.frame(ufid = ufid,
+                 true_ate = cf_ate,
+                 ate_est = our_estimate$effect_size,
+                 ci_left = our_estimate$li,
+                 ci_right = our_estimate$ri,
+                 mse = est_mse,
+                 ci_covers_true_ate = ci_covers_true_ate)
     
     # Compile into a dataframe.
     stats = rbind.data.frame(stats, result, stringsAsFactors = FALSE)
