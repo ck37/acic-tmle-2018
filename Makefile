@@ -124,7 +124,7 @@ endif
 # Start a bash session with 2 nodes, for up to 12 hours.
 # TODO: support non-Savio execution.
 bash:
-	srun -A ${ACCOUNT} -p ${SAVIO_PARTITION} -N 2 -t 12:00:00 --pty bash
+	srun -A ${SBATCH_ACCOUNT} -p ${SAVIO_PARTITION} -N 2 -t 720 --pty bash
 
 # Next line ensures that this rule works even if there's a file named "clean".
 .PHONY : clean
