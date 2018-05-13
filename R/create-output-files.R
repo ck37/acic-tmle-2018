@@ -17,9 +17,8 @@ create_output_files =
   # TODO: should not be using $cf_files, doesn't exist for the real data.
   for (file in results$cf_files) {
     ufid = gsub("^.*/([^./]+?)\\_cf.csv$", "\\1", file, perl = TRUE)
-    newfiles = c(newfiles, paste0("exports/submission/", ufid, ".csv"))
-    # TODO: use the output_dir_ipo argument.
-    write.csv(results$ipos[[ufid]], file = paste0("exports/submission/", ufid, ".csv"))
+    newfiles = c(newfiles, paste0(output_dir_ipo, "/", ufid, ".csv"))
+    write.csv(results$ipos[[ufid]], file = paste0(output_dir_ipo, "/", ufid, ".csv"))
   }
   # Put these in a .zip file
   zip("exports/submission.zip", newfiles)
