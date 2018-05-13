@@ -125,6 +125,13 @@ revere_cvtmle_basic =
   Q1W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q1W_task)))
   Q0W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q0W_task)))
   
+  
+  # Explicitly bound to observed outcome bounds.
+  y_bounds = c(min(y_sub), max(y_sub))
+  QAW = bound(QAW, y_bounds)
+  Q1W = bound(Q1W, y_bounds)
+  Q0W = bound(Q0W, y_bounds)
+  
   if (max(QAW, na.rm = TRUE) > max(y, na.rm = TRUE) ||
       min(QAW, na.rm = TRUE) < min(y, na.rm = TRUE)) {
     warning("QAW predictions are outside of Y bounds - sl3 library may be misconfigured.")
@@ -177,6 +184,10 @@ revere_cvtmle_basic =
   
   # stacked val set preds on very close to new data
   g1W = metalearner_eval_g(coefg, as.matrix(g1W_stack))
+  
+  # Manually bound g1W, is not staying within [0, 1]
+  # TODO: investigate why and remove the need to bound it.
+  g1W = bound(g1W, c(0, 1))
   
   if (max(g1W, na.rm = TRUE) > 1 || min(g1W, na.rm = TRUE) < 0) {
     warning("g1W predictions are outside of [0, 1] - sl3 library may be misconfigured.")
