@@ -9,6 +9,7 @@ create_output_files =
     write.csv(results$revere$ate_df, file = output_file_ate)
     
   # (2) individual potential outcomes for each individual data file, 
+    dir.create(file.path("exports", "submission"), showWarnings = FALSE)
     newfiles = NULL
     for(file in results$cf_files){
       ufid = gsub("^.*/([^./]+?)\\_cf.csv$", "\\1", file, perl = TRUE)
