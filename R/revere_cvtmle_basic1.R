@@ -3,7 +3,7 @@
 
 # Relies on Lrnr_cv2 in R/lrnr_cv2.R
 
-revere_cvtmle_basic =
+revere_cvtmle_basic1 =
   function(data,
            outcome_field = "y",
            treatment_field = "z",
