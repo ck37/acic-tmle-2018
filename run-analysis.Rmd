@@ -117,6 +117,10 @@ if (exists("results") && "tmle_glm" %in% names(results) &&
 }
 ```
 
+Coverage: 33%
+
+Note that file 10 is very far off on its ATE estimate, and that's the file that has no censoring. Need to investigate.
+
 ## Analysis: tmle
 
 ```{r analysis_tmle}
