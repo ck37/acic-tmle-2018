@@ -50,9 +50,10 @@ SL.xgb = function(Y, X, newX, family, obsWeights, id, ntrees = 1000,
 # Multiple versions of XGBoost if we can afford the extra computation.
 # Keep the grid pretty small: 6 learners.
 sl_xgb = create.Learner("SL.xgb", detailed_names = T,
-                        params = list(nthread = 4, ntrees = 1000),
-                        tune = list(max_depth = c(2, 4),
-                                    shrinkage = c(0.05, 0.1, 0.2)))
+                        params = list(nthread = RhpcBLASctl::get_num_cores(),
+                                      ntrees = 1000L),
+                        tune = list(max_depth = c(2, 4, 8),
+                                    shrinkage = c(0.001, 0.01)))
 length(sl_xgb$names)
 
 # Small SVM grid for cost parameter and kernel.
