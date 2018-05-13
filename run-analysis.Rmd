@@ -157,7 +157,8 @@ results$tmle =
     input_file_covariates = conf$input_file_covariates,
     tmle_wrapper = wrapper_tmle_better,
     # Need to do stratified cross-validation. Should fit SL outside of tmle.
-    #specific_files = c("9333a461d3944d089ef60cdf3b88fd40"),
+    # glmnet wrapper is failing during censoring estimation on this file:
+    # specific_files = c("9333a461d3944d089ef60cdf3b88fd40"),
     verbose = TRUE)
 ```
 
