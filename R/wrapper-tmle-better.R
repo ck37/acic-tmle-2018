@@ -74,14 +74,15 @@ wrapper_tmle_better =
   ),
   # create.Learner() grids.
   #sl_glmnet_em15$names,
-  #sl_xgb$names,
+  sl_xgb$names,
   # Temporarily turn off SVM due to errors Vince is getting.
   #sl_ksvm$names, 
   list(
     #"SL.randomForest_fast",
     # "SL.xgboost_fast",
     "SL.ranger_fast",
-    c("SL.glmnet_fast", "All", "screen.corRank8"),
+    # Turn off glmnet, seems to yield an error on file 7
+    # c("SL.glmnet_fast", "All", "screen.corRank8"),
     c("SL.nnet", "All", "screen.corRank8"),
     #c("SL.earth", "prescreen.nosq"),
     # Works only if parallel = F. Do not use with mcSuperlearner!
@@ -100,7 +101,7 @@ wrapper_tmle_better =
   # Temporarily turn off SVM due to errors Vince is getting.
   #sl_ksvm$names, 
   list(
-    c("SL.glmnet_fast", "All","screen.corRank8"),
+#    c("SL.glmnet_fast", "All","screen.corRank8"),
     c("SL.nnet", "All","screen.corRank8"),
     #c("SL.earth", "prescreen.nosqr"),
     # Works only if parallel = F. Do not use with mcSuperlearner!
