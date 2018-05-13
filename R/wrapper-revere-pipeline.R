@@ -45,15 +45,20 @@ wrapper_revere_pipeline =
     lrnr_stack_Q =
       make_learner(Stack,
                    lrnr_mean,
+                   lrnr_glm,
                    pipeline_glm, 
                    # failing with "system is computationally singular" errors.
                    #lrnr_glm_fast, 
                    # TODO: fix glmnet, is yielding warnings and not working.
                    # lrnr_glmnet,
                    # TODO: increase java memory so we can use bartMachine
+                   # lrnr_bartMachine,
                    # pipeline_bartMachine,
+                   # lrnr_dbarts,
                    # pipeline_dbarts,
+                   # lrnr_grf,
                    # pipeline_grf,
+                   lrnr_xgboost,
                    pipeline_xgboost)
     
     # metalearner_eval_Q = metalearner_logistic_binomial
