@@ -116,6 +116,10 @@ run_analysis =
                                prescreen = prescreen,
                                verbose = verbose)
     
+    # Put sample_id back in the ipo data frame (required in exported file)
+    tmle_result$ipo_df = cbind(data[[id_field]], tmle_result$ipo_df)
+    names(tmle_result$ipo_df)[1] = "sample_id"
+    
     # Put estimates into a list for rbinding into a dataframe.
     ate_result = cbind.data.frame(ufid = ufid, 
                             # Population ATE.
