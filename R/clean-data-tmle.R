@@ -12,6 +12,12 @@ clean_data_tmle =
       cat("\nclean_date_tmle() - begin processing.\n")
     }
     
+    # Check for missing valuesin covars_df
+    total_missing_values = sum(is.na(covars_df))
+    if (verbose) {
+      cat("Total missing values in covars_df:", total_missing_values, "\n")
+    }
+    
     # Remove constant columns from the covariate file.
     # NOTE: this won't work for factors, would need to use length(unique())
     # and possibly also remove NAs.

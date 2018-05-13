@@ -50,14 +50,16 @@ run_analysis =
   covariate_df = results$data
   id = results$id
   
-  # Dataframe to save ATE estimates for each file.
-  ate_df = NULL
-  # List of individual potential outcome estimates for each file.
-  ipo_list = list()
-  
   # Looping over all "factual" files.
   cat("\nBegin processing factual datasets.\n")
-  for (file in files) {
+  
+  # for (file in files) {
+  estimation_results = future.apply::future_lapply(files,
+  # Ensure that workers have all relevant libraries available.
+  # TODO: add github packages (may need a helper function)
+    future.packages = attr(startup, "packages_cran"),
+    # future.globals = c("aorder"),
+    FUN = function(file) {
     # Measure the execution time needed to analyze each file.
     time_start = proc.time()
     
@@ -80,7 +82,11 @@ run_analysis =
     
     # Import one counterfactual file
     # Column names are sample_id, z (treatment), and y (outcome)
-    cf = rio::import(file)
+    if (file.exists(file)) {
+      cf = rio::import(file)
+    } else {
+      stop(paste("Can't find file:", file))
+    }
     
     # Merge into single dataset
     data = merge(cf, covariate_df, by.x = id_field, by.y = id_field,
@@ -120,26 +126,41 @@ run_analysis =
     tmle_result$ipo_df = cbind(data[[id_field]], tmle_result$ipo_df)
     names(tmle_result$ipo_df)[1] = "sample_id"
     
-    # Put estimates into a list for rbinding into a dataframe.
-    ate_result = cbind.data.frame(ufid = ufid, 
+    # Put estimates into a one row df for later rbinding into a dataframe.
+    ate_result = data.frame(ufid = ufid, 
                             # Population ATE.
                             effect_size = tmle_result$ate_est,
                             # Left confidence interval.
                             li = tmle_result$ci_left,
                             # Right confidence interval.
-                            ri = tmle_result$ci_right
-                            )
-    
-    # Integrate into dataframe for the ATEs.
-    ate_df = rbind.data.frame(ate_df, ate_result, stringsAsFactors = FALSE)
-    
-    # Save individual potential outcome result.
-    ipo_list[[ufid]] = tmle_result$ipo_df
+                            ri = tmle_result$ci_right)
     
     time_end = proc.time()
     time_elapsed = (time_end - time_start)
     cat("Time elapsed:", round(time_elapsed["elapsed"] / 60, 1L), "minutes.\n\n")
-  }
+    
+    # Compile results to return via future
+    result = list(
+      "ufid" = ufid,
+      "ate_result" = ate_result,
+      # Individual potential outcomes
+      "ipos" = tmle_result$ipo_df,
+      "time_elapsed" = time_elapsed["elapsed"]
+    )
+    
+    result
+  #}
+  })
+  
+  # Extract ate_results and integrate into dataframe.
+  ate_df = do.call(rbind.data.frame,
+                   lapply(estimation_results, `[[`, "ate_result"))
+  # Convert ufid back to a string.
+  ate_df$ufid = as.character(ate_df$ufid)
+  
+  # Extract IPO dataframes and combine into one list.
+  ipo_list = lapply(estimation_results, `[[`, "ipos")
+  names(ipo_list) = lapply(estimation_results, `[[`, "ufid")
   
   # Compile results.
   results = list(

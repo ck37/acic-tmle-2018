@@ -35,7 +35,8 @@ wrapper_revere_glm =
   
   # for nnls metalearner
   metalearner_eval_Q = metalearner_linear
-  metalearner_Q = make_learner(Lrnr_nnls)
+  #metalearner_Q = make_learner(Lrnr_nnls)
+  metalearner_Q = make_learner(Lrnr_nnls_convex)
   
   # TODO: work on this section so that fewer variable names are created.
   # It's somewhat duplicative/roundabout at the moment.

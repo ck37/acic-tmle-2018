@@ -108,6 +108,7 @@ attr(startup, "packages_cran") = c(
   "assertthat",
   "tmle",
   "rJava",
+  "future",
 
   # Visualization
   "ggplot2",
