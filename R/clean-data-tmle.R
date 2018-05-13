@@ -19,7 +19,7 @@ clean_data_tmle =
     # even if the covariate should actually be a factor (ex, race)
     constant_columns = which(apply(covars_df, MARGIN = 2L, var) == 0)
     
-    if(length(constant_columns) > 0) {
+    if (length(constant_columns) > 0) {
       covars_df = covars_df[, -constant_columns, drop = FALSE]
     }
     
@@ -43,8 +43,7 @@ clean_data_tmle =
     }
     
     # Make sure we don't switch to a vector if only 1 column remains.
-    # Subtract 1L because y is the first column in the caret analysis.
-    covars_df = covars_df[, !colnames(covars_df) %in% colnames(covars_df)[linear_combos$remove - 1L], 
+    covars_df = covars_df[, !colnames(covars_df) %in% colnames(covars_df)[linear_combos$remove], 
                           drop = FALSE]
     if (verbose) {
       cat("Updated covariate count:", ncol(covars_df), "\n")
