@@ -98,6 +98,10 @@ run_analysis =
           paste0(round(mean(analysis_data[[treatment_field]], na.rm = TRUE) * 100, 1), "%"),
           "Censored pct:",
           paste0(round(mean(is.na(analysis_data[[outcome_field]])) * 100, 1), "%"),
+          "\nOutcome bounds:", round(c(min(analysis_data[[outcome_field]], na.rm = TRUE),
+                               max(analysis_data[[outcome_field]], na.rm = TRUE)), 2),
+          "Treatment bounds:", round(c(min(analysis_data[[treatment_field]], na.rm = TRUE),
+                               max(analysis_data[[treatment_field]], na.rm = TRUE)), 2),
           "\n")
     }
     
