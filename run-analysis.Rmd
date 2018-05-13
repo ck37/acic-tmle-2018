@@ -17,6 +17,8 @@ conf = list(
 startup(auto_install = FALSE, verbose = TRUE, java_mem = conf$java_mem)
 # Load all .R files in R/
 ck37r::load_all_code("R")
+
+options(sl3.verbose = TRUE)
 ```
 
 ## Configure analysis
@@ -91,6 +93,8 @@ if (exists("results") && "revere_glm" %in% names(results) &&
 ```
 
 58% coverage!
+
+File 10 seems kind of messed up - crazy wide CI and ATE is far off.
 
 ## Analysis: revere glmnet
 
@@ -178,7 +182,7 @@ if (exists("results") && "tmle" %in% names(results) &&
 ```{r create_output}
 output_files =
   create_output_files(
-    results,
+    results$revere,
     output_file_ate = conf$output_file_ate,
     output_dir_ipo = conf$output_dir_ipo,
     verbose = TRUE)

@@ -19,14 +19,39 @@ options(sl3.verbose = TRUE)
 
 #####################################
 ## @knitr setup_savio
-print("Test")
+
+(conf = c(conf, list(
+  input_dir_counterfactuals = "data-raw/practice-censoring",
+  input_file_covariates = "data-raw/x.csv",
+  output_file_ate = "exports/ate-test.csv",
+  # IPO = Individual potential outcomes
+  output_dir_ipo = "exports/ipo-test"
+)))
+
+results = list()
+
+# TODO: setup multi-node parallelization
 
 #####################################
 ## @knitr analysis_revere_glm
 
+results$revere_glm =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_revere_glm,
+    verbose = TRUE)
 
 #####################################
 ## @knitr eval_revere_glm
+
+if (exists("results") && "revere_glm" %in% names(results) &&
+    "cf_files" %in% names(results$revere_glm) && length(results$revere_glm$cf_files) > 0L) {
+  stats = evaluate_estimates(results$revere_glm, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-revere-glm.RData")
+}
 
 #####################################
 ## @knitr create_output_files
