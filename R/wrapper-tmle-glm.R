@@ -9,7 +9,7 @@ wrapper_tmle_glm =
   # This function name would be passed into run_analyis() and would be
   # executed within R/estimate-ate.R
   if (verbose) {
-    cat("Running wrapper_tmle_glm().\n")
+    cat("\nwrapper_tmle_glm() - begin.\n")
   }
   
   ##############
