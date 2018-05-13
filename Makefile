@@ -114,7 +114,7 @@ else
 endif
 
 # TODO: upgrade to use 4-8 nodes.
-savio: savio-analysis.R
+savio: analysis-savio.R
 ifeq (${JOB_ENGINE},slurm)
 	${SBATCH} --nodes 1 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
 else
