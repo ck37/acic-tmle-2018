@@ -8,6 +8,7 @@ estimate_ate =
            id_field = "id",
            prescreen = TRUE,
            squared = TRUE,
+           screen_alpha = .2,
            verbose = FALSE) {
     
   # Extract outcome variable
@@ -39,6 +40,7 @@ estimate_ate =
                                  treatment_vec = treatment_vec,
                                  prescreen = prescreen,
                                  squared = squared,
+                                 screen_alpha = screen_alpha,
                                  verbose = verbose)
   data_new = covar_result$data
   covariate_df = covar_result$covariate_dfY
