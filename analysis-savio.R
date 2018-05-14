@@ -39,22 +39,28 @@ plan(list(tweak(future::cluster, workers = nodes, revtunnel = FALSE)))
 #####################################
 ## @knitr analysis_revere_glm
 
-results$revere_glm =
+#results$revere_glm =
+results$revere =
   run_analysis(
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
-    tmle_wrapper = wrapper_revere_glm,
+    #tmle_wrapper = wrapper_revere_glm,
+    tmle_wrapper = wrapper_revere_basic,
     verbose = TRUE)
 
 #####################################
 ## @knitr eval_revere_glm
 
-if (exists("results") && "revere_glm" %in% names(results) &&
-    "cf_files" %in% names(results$revere_glm) && length(results$revere_glm$cf_files) > 0L) {
-  stats = evaluate_estimates(results$revere_glm, verbose = TRUE)
+if (exists("results") && "revere_basic" %in% names(results) &&
+    "cf_files" %in% names(results$revere_basic) && length(results$revere_basic$cf_files) > 0L) {
+  stats = evaluate_estimates(results$revere_basic, verbose = TRUE)
+#if (exists("results") && "revere_glm" %in% names(results) &&
+#    "cf_files" %in% names(results$revere_glm) && length(results$revere_glm$cf_files) > 0L) {
+#  stats = evaluate_estimates(results$revere_glm, verbose = TRUE)
   print(stats)
   save(results, stats,
-       file = "data/results-stats-revere-glm.RData")
+       #file = "data/results-stats-revere-glm.RData")
+       file = "data/results-stats-revere-basic.RData")
 }
 
 #####################################
