@@ -42,11 +42,22 @@ wrapper_tmle_glm =
     
   #####
   # Setup SL libraries.
+  
+  # Lame that we have to use GlobalEnv to pass through this function, maybe
+  # there is a cleaner way to do this.
+  .GlobalEnv$q_screener = function(...) screen.select_vars(..., vars = covariates_Q)
+  .GlobalEnv$g_screener = function(...) screen.select_vars(..., vars = covariates_g)
+  .GlobalEnv$c_screener = function(...) screen.select_vars(..., vars = covariates_c)
+  # Combined g and c screener for tmle::tmle()
+  .GlobalEnv$g_c_screener = function(...) screen.select_vars(..., vars = unique(c(covariates_g, covariates_g)))
     
   # Placeholder library
-  sl_lib = c("SL.mean", "SL.glm")
-  
-  q_lib = g_lib = sl_lib
+  q_lib = list("SL.mean", c("SL.glm", "q_screener"))
+  # TODO: estimate g outside of tmle and use its own g_screener
+  g_lib = list("SL.mean", c("SL.glm", "g_c_screener"))
+  # 
+  # TODO: estimate c outside of tmle and use its own c_screener
+  # c_lib = list("SL.mean", c("SL.glm", "c_screener"))
   
   #####
   # Define probability family for outcome.
@@ -62,14 +73,16 @@ wrapper_tmle_glm =
   
   # TODO: conduct SL estimation outside of tmle() so that we can use our
   # covariate subsets, conduct stratified CV, etc.
-  tmle_result = tmle(Y = data[[outcome_field]],
-                     A = data[[treatment_field]],
-                     W = data[, unique(c(covariates_Q, covariates_g, covariates_c)), drop = FALSE],
-                     Delta = as.integer(!is.na(data[[outcome_field]])),
-                     Q.SL.library = q_lib,
-                     g.SL.library = g_lib,
-                     family = family,
-                     verbose = verbose)
+  tmle_result =
+    tmle(Y = data[[outcome_field]],
+         A = data[[treatment_field]],
+         W = data[, unique(c(covariates_Q, covariates_g, covariates_c)), drop = FALSE],
+         Delta = as.integer(!is.na(data[[outcome_field]])),
+         # TODO: estimate SL outside of tmle::tmle() and just pass in the results.
+         Q.SL.library = q_lib,
+         g.SL.library = g_lib,
+         family = family,
+         verbose = verbose)
   
   # TODO: Create potential outcomes dataframe out of the preds_all dataframe.
   # Which columns should we use for y0 and y1?
