@@ -5,6 +5,7 @@ wrapper_drtmle_glm =
            treatment_field = "z",
            id_field = NULL,
            covariate_fields = NULL,
+           cv_folds = 4,
            verbose = FALSE) {
   # This function name would be passed into run_analyis() and would be
   # executed within R/estimate-ate.R
@@ -95,6 +96,7 @@ wrapper_drtmle_glm =
            SL_g = list("A" = g_lib, "DeltaY" = c_lib),
            SL_Qr = qr_lib,
            SL_gr = gr_lib,
+           cvFolds = cv_folds,
            # Qn - pass in Q0W and Q1W estimates directly.
            # gn - pass in g0W and g1W estimates directly.
            # Package will handle family automatically.
