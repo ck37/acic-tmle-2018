@@ -22,7 +22,10 @@ run_analysis =
   
   # Import counterfactuals; this includes the real files and possibly
   # the true counteractual files.
-  all_files = list.files(path = input_dir_counterfactuals, full.names = TRUE)
+  all_files = list.files(path = paste0(here::here(), "/", input_dir_counterfactuals),
+                         full.names = TRUE)
+  
+  # all_files = paste0(here::here(), "/", all_files)
   
   # Now apply perl regex, selecting only files that don't end in _cf.csv.
   files = all_files[grepl(input_pattern, all_files, perl = TRUE)]
@@ -84,7 +87,8 @@ run_analysis =
     # Column names are sample_id, z (treatment), and y (outcome)
     # Add full path to help parallelization on savio.
     # TODO: create a load_datasets() that is separate from run_analysis()
-    full_file = paste0(here::here(), "/", file)
+    #full_file = paste0(here::here(), "/", file)
+    full_file = file
     if (file.exists(full_file)) {
       cf = rio::import(full_file)
     } else {
