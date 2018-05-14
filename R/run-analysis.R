@@ -13,6 +13,7 @@ run_analysis =
     treatment_field = "z",
     tmle_wrapper = NULL,
     prescreen = TRUE,
+    screen_alpha = .2,
     verbose = TRUE) {
   
   # Check that input_dir_counterfactuals exists
@@ -127,6 +128,7 @@ run_analysis =
                                id_field = id_field,
                                tmle_wrapper = tmle_wrapper,
                                prescreen = prescreen,
+                               screen_alpha = screen_alpha,
                                verbose = verbose)
     
     # Put sample_id back in the ipo data frame (required in exported file)
