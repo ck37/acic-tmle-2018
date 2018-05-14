@@ -23,8 +23,8 @@ revere_cvtmle_basic =
            metalearner_eval_g = NULL,
            bounds_Q = c(min(data[[outcome_field]], na.rm = TRUE),
                         max(data[[outcome_field]], na.rm = TRUE)),
-           bounds_g = 0.025,
-           bounds_c = 0.025,
+           bounds_g = c(0.0025, 1),
+           bounds_c = c(0.0025, 1),
            verbose = FALSE) {  
     
   if (is.null(metalearner_c)) metalearner_c = metalearner_Q
