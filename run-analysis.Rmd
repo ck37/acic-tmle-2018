@@ -44,6 +44,7 @@ results$revere =
     input_file_covariates = conf$input_file_covariates,
     tmle_wrapper = wrapper_revere_basic,
     # specific_files = c("d1546da12d8e4daf8fe6771e2187954d"),
+    screen_alpha = .2,
     verbose = TRUE)
 ```
 
