@@ -137,6 +137,37 @@ revere_cvtmle_basic =
   Q1W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q1W_task)))
   Q0W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q0W_task)))
   
+  if (verbose) {
+    # Count how many observations are affected by bounding.
+    
+    # QAW
+    bounded_obs = sum(max(QAW, na.rm = TRUE) > max(bounds_Q) |
+      min(QAW, na.rm = TRUE) < min(bounds_Q))
+    if (bounded_obs > 0L) {
+      cat("Obs bounded by QAW:", bounded_obs,
+          paste0("(", round(bounded_obs / length(y_sub) * 100, 1), "%)\n"),
+          "Min:", min(QAW, na.rm = TRUE), "Max:", max(QAW, na.rm = TRUE), "\n")
+    }
+    
+    # Q1W
+    bounded_obs = sum(max(Q1W, na.rm = TRUE) > max(bounds_Q) |
+                        min(Q1W, na.rm = TRUE) < min(bounds_Q))
+    if (bounded_obs > 0L) {
+      cat("Obs bounded by Q1W:", bounded_obs, 
+          paste0("(", round(bounded_obs / length(y_sub) * 100, 1), "%)\n"),
+          "Min:", min(Q1W, na.rm = TRUE), "Max:", max(Q1W, na.rm = TRUE), "\n")
+    }
+    
+    # Q0W
+    bounded_obs = sum(max(Q0W, na.rm = TRUE) > max(bounds_Q) |
+                        min(Q0W, na.rm = TRUE) < min(bounds_Q))
+    if (bounded_obs > 0L) {
+      cat("Obs bounded by Q0W:", bounded_obs,
+          paste0("(", round(bounded_obs / length(y_sub) * 100, 1), "%)\n"),
+          "Min:", min(Q0W, na.rm = TRUE), "Max:", max(Q0W, na.rm = TRUE), "\n")
+    }
+  }
+  
   # Explicitly bound to observed outcome bounds.
   QAW = bound(QAW, bounds_Q)
   Q1W = bound(Q1W, bounds_Q)
@@ -195,14 +226,26 @@ revere_cvtmle_basic =
   # stacked val set preds on very close to new data
   g1W = metalearner_eval_g(coefg, as.matrix(g1W_stack))
   
+  bounded_obs = sum(max(g1W, na.rm = TRUE) > max(bounds_g) |
+                      min(g1W, na.rm = TRUE) < min(bounds_g))
+  if (verbose) {
+    if (bounded_obs > 0L) {
+      cat("Obs bounded by g1W:", bounded_obs,
+          paste0("(", round(bounded_obs / length(y_sub) * 100, 1), "%)\n"),
+          "Min:", min(g1W, na.rm = TRUE), "Max:", max(g1W, na.rm = TRUE), "\n")
+    }
+  }
+  
+  if (max(g1W, na.rm = TRUE) > 1 || min(g1W, na.rm = TRUE) < 0) {
+    warning(paste("g1W predictions are outside of [0, 1] - sl3 library may be misconfigured.",
+                  "Min:", min(g1W, na.rm = TRUE),
+                  "Max:", max(g1W, na.rm = TRUE)))
+  }
+  
   # Manually bound g1W, is not staying within [0, 1]
   # TODO: investigate why and remove the need to bound it.
   g1W = bound(g1W, bounds_g)
-  
-  if (max(g1W, na.rm = TRUE) > 1 || min(g1W, na.rm = TRUE) < 0) {
-    warning("g1W predictions are outside of [0, 1] - sl3 library may be misconfigured.")
-  }
-  
+
   if (any(C == 1)) {
     # fit on folds and predict on subsetted folds for g and c
     c1W_task = make_sl3_Task(data = data, covariates = covariates_c,
@@ -250,10 +293,24 @@ revere_cvtmle_basic =
     c1W_A1 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA1))
     c1W_A0 = 1 - metalearner_eval_c(coefc, as.matrix(c1W_stackA0))
     
-    # CK: these are not bounded by [0, 1], need to manually bound.
-    # TODO: figure out what's going onto yield binomial predictions outside of [0, 1].
-    c1W_A1 = bound(c1W_A1, bounds_c)
-    c1W_A0 = bound(c1W_A0, bounds_c)
+    if (verbose) {
+      
+      # C1W_A1
+      bounded_obs = sum(max(c1W_A1, na.rm = TRUE) > max(bounds_c) |
+                        min(c1W_A1, na.rm = TRUE) < min(bounds_c))
+      if (bounded_obs > 0L) {
+        cat("Obs bounded by c1W_A1:", bounded_obs,
+            paste0("(", round(bounded_obs / nrow(data) * 100, 1), "%)"), "\n")
+      }
+      
+      # C1W_A0
+      bounded_obs = sum(max(c1W_A0, na.rm = TRUE) > max(bounds_c) |
+                        min(c1W_A0, na.rm = TRUE) < min(bounds_c))
+      if (bounded_obs > 0L) {
+        cat("Obs bounded by c1W_A0:", bounded_obs,
+            paste0("(", round(bounded_obs / nrow(data) * 100, 1), "%)"), "\n")
+      }
+    }
     
     # Check if we are within bounds for a [0, 1] prediction.
     if (max(c1W_A1, na.rm = TRUE) > 1 || min(c1W_A1, na.rm = TRUE) < 0) {
@@ -268,6 +325,10 @@ revere_cvtmle_basic =
                      "Max:", max(c1W_A0, na.rm = TRUE),
                      "Min:", min(c1W_A0, na.rm = TRUE)))
     }
+    
+    # TODO: figure out what's going onto yield binomial predictions outside of [0, 1].
+    c1W_A1 = bound(c1W_A1, bounds_c)
+    c1W_A0 = bound(c1W_A0, bounds_c)
     
     pDelta1 = matrix(c(c1W_A0, c1W_A1), ncol = 2)
     
