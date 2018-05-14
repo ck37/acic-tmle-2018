@@ -21,6 +21,10 @@ revere_cvtmle_basic =
            metalearner_eval_Q,
            metalearner_eval_c = NULL, 
            metalearner_eval_g = NULL,
+           bounds_Q = c(min(data[[outcome_field]], na.rm = TRUE),
+                        max(data[[outcome_field]], na.rm = TRUE)),
+           bounds_g = 0.025,
+           bounds_c = 0.025,
            verbose = FALSE) {  
     
   if (is.null(metalearner_c)) metalearner_c = metalearner_Q
@@ -31,6 +35,14 @@ revere_cvtmle_basic =
   if (is.null(lrnr_stack_c)) lrnr_stack_c = lrnr_stack_Q 
   if (is.null(lrnr_stack_g)) lrnr_stack_g = lrnr_stack_Q 
   if (is.null(covariates_c)) covariates_c = covariates_g
+  
+  if (length(bounds_g) == 1L) {
+    bounds_g = c(bounds_g, 1 - bounds_g)
+  }
+  
+  if (length(bounds_c) == 1L) {
+    bounds_c = c(bounds_c, 1 - bounds_c)
+  }
   
   cv_lrnr_Q = Lrnr_cv2$new(lrnr_stack_Q)
   cv_lrnr_c = Lrnr_cv2$new(lrnr_stack_c)
@@ -125,12 +137,10 @@ revere_cvtmle_basic =
   Q1W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q1W_task)))
   Q0W = metalearner_eval_Q(coefQ, as.matrix(cv_lrnr_fit$predict(Q0W_task)))
   
-  
   # Explicitly bound to observed outcome bounds.
-  y_bounds = c(min(y_sub), max(y_sub))
-  QAW = bound(QAW, y_bounds)
-  Q1W = bound(Q1W, y_bounds)
-  Q0W = bound(Q0W, y_bounds)
+  QAW = bound(QAW, bounds_Q)
+  Q1W = bound(Q1W, bounds_Q)
+  Q0W = bound(Q0W, bounds_Q)
   
   if (max(QAW, na.rm = TRUE) > max(y, na.rm = TRUE) ||
       min(QAW, na.rm = TRUE) < min(y, na.rm = TRUE)) {
@@ -187,7 +197,7 @@ revere_cvtmle_basic =
   
   # Manually bound g1W, is not staying within [0, 1]
   # TODO: investigate why and remove the need to bound it.
-  g1W = bound(g1W, c(0, 1))
+  g1W = bound(g1W, bounds_g)
   
   if (max(g1W, na.rm = TRUE) > 1 || min(g1W, na.rm = TRUE) < 0) {
     warning("g1W predictions are outside of [0, 1] - sl3 library may be misconfigured.")
@@ -242,8 +252,8 @@ revere_cvtmle_basic =
     
     # CK: these are not bounded by [0, 1], need to manually bound.
     # TODO: figure out what's going onto yield binomial predictions outside of [0, 1].
-    c1W_A1 = bound(c1W_A1, c(0, 1))
-    c1W_A0 = bound(c1W_A0, c(0, 1))
+    c1W_A1 = bound(c1W_A1, bounds_c)
+    c1W_A0 = bound(c1W_A0, bounds_c)
     
     # Check if we are within bounds for a [0, 1] prediction.
     if (max(c1W_A1, na.rm = TRUE) > 1 || min(c1W_A1, na.rm = TRUE) < 0) {
