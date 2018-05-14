@@ -133,5 +133,6 @@ attr(startup, "packages_github") = c(
   "ck37/ck37r",
   "jeremyrcoyle/gentmle2",
   "vdorie/dbarts",
-  "jeremyrcoyle/delayed"
+  "jeremyrcoyle/delayed",
+  "benkeser/drtmle"
 )
