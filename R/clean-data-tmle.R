@@ -60,6 +60,23 @@ clean_data_tmle =
   
   rm(linear_combos)
   
+  highlyCorDescr <- findCorrelation(cor(covars_df), cutoff = .7)
+
+  if (length(highlyCorDescr) > 0){
+    
+    if (verbose) {
+      cat("Removing", length(highlyCorDescr), "covariates due to correlation exceeding 0.7.\n")
+    }
+    
+    covars_df <- covars_df[, -highlyCorDescr, drop = FALSE]
+    if (verbose) {
+      cat("Updated covariate count:", ncol(covars_df), "\n")
+    }
+  } else {
+    cat("No residual near-collinearity found.\n")
+  }
+  # dim(solve(cov(covars_df)))
+  
   # Compute covariance matrix.
   cov_mat = cov(covars_df)
   
