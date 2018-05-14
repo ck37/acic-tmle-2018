@@ -76,7 +76,15 @@ run_analysis =
         if (verbose) {
           cat("Skipping", ufid, "- not one of the specific files.\n")
         }
-        next
+        
+        # Return a null result to future.
+        return(list(
+          "ufid" = NULL,
+          "ate_result" = NULL,
+          # Individual potential outcomes
+          "ipos" = NULL,
+          "time_elapsed" = NULL
+        ))
       }
     }
     
