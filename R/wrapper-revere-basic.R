@@ -19,6 +19,9 @@ wrapper_revere_basic =
   # This is based on revere_cvtmle_example.R
     
   num_cores = RhpcBLASctl::get_num_cores()
+  
+  # Speed up bartMachine by enabling multicore execution.
+  bartMachine::set_bart_machine_num_cores(num_cores)
     
   lrnr_mean = make_learner(Lrnr_mean)
   lrnr_glm = make_learner(Lrnr_glm)
@@ -32,6 +35,9 @@ wrapper_revere_basic =
   lrnr_bartMachine = make_learner(Lrnr_bartMachine)
   lrnr_dbarts = make_learner(Lrnr_dbarts)
   lrnr_grf = make_learner(Lrnr_grf)
+  # NOTE: ranger needs to have probability = TRUE for binomial outcomes.
+  # Current sl3 implementation doesn't handle this :/
+  lrnr_ranger = make_learner(Lrnr_ranger)
   
   lrnr_stack_Q =
     make_learner(Stack,
@@ -94,8 +100,8 @@ wrapper_revere_basic =
   # Compile results.  
   results =
     list(ate_est = tmle_result$ate_est,
-         ci_left = tmle_result$CI[2],
-         ci_right = tmle_result$CI[3],
+         ci_left = tmle_result$conf_int[1],
+         ci_right = tmle_result$conf_int[2],
          # Dataframe of individual potential outcomes.
          ipo_df = tmle_result$potential_oc)
    
