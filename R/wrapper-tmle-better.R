@@ -65,7 +65,7 @@ wrapper_tmle_better =
   # Setup SL libraries.
   
   q_lib = c(list(# speedglm doesn't work :/ just use plain ol' glm.
-    c("SL.glm", "All", "screen.corRank8", "prescreen_nosqr")#,
+    c("SL.speedglm", "All", "screen.corRank8", "prescreen_nosqr")#,
     #c("SL.mgcv", "All", "prescreen.nosq"),
     #c("sg.gbm.2500", "prescreen.nocat"),
   ),
@@ -85,7 +85,7 @@ wrapper_tmle_better =
     "SL.mean"))
   
   # Need a separate g lib that does not include effect modification learners.
-  g_lib = c(list(c("SL.glm", "All", "screen.corRank8", "prescreen.nosq"),
+  g_lib = c(list(c("SL.speedglm", "All", "screen.corRank8", "prescreen.nosq"),
                  #c("SL.mgcv", "All", "prescreen.nosq"),
                  #c("sg.gbm.2500", "prescreen.nocat"),
                  #"SL.xgboost_fast",
@@ -102,7 +102,10 @@ wrapper_tmle_better =
     # Works only if parallel = F. Do not use with mcSuperlearner!
     "SL.bartMachine2",
     "SL.mean"))
-    
+  
+  if(F){
+    q_lib = "SL.mean"
+  }
   
   #q_lib = g_lib = sl_lib
   g_lib = q_lib
@@ -128,9 +131,12 @@ wrapper_tmle_better =
                      family = family,
                      verbose = verbose)
   
-  # TODO: Create potential outcomes dataframe out of the preds_all dataframe.
-  # Which columns should we use for y0 and y1?
-  potential_outcomes_df = data.frame()
+  # Create potential outcomes dataframe
+  y0 = tmle_result$Qinit$Q[,1] 
+  y1 = tmle_result$Qinit$Q[,2]
+  
+  # Compile individual predictions.
+  potential_outcomes_df = data.frame(y0 = y0, y1 = y1)
   
   # Compile results.  
   results =
@@ -138,7 +144,7 @@ wrapper_tmle_better =
          ci_left = tmle_result$estimates$ATE$CI[1],
          ci_right = tmle_result$estimates$ATE$CI[2],
          # Dataframe of individual potential outcomes.
-         potential_outcomes = potential_outcomes_df)
+         ipo_df = potential_outcomes_df)
   
   # These results will be processed within R/estimate-ate.R
   return(results)
