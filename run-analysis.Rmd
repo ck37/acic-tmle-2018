@@ -76,6 +76,7 @@ results$revere_glm =
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
     tmle_wrapper = wrapper_revere_glm,
+    # screen_alpha = 0.1,
     verbose = TRUE)
 ```
 
@@ -179,12 +180,74 @@ if (exists("results") && "tmle" %in% names(results) &&
 }
 ```
 
+## Analysis: drtmle-glm
+
+```{r analysis_drtmle_glm}
+results$drtmle_glm =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_drtmle_glm,
+    # Need to do stratified cross-validation. Should fit SL outside of tmle.
+    #specific_files = c("9333a461d3944d089ef60cdf3b88fd40"),
+    #specific_files = c("e36aca1030264e638452ea4053cbb42c"),
+    verbose = TRUE)
+```
+
+## Evaluate: drtmle-glm
+
+```{r eval_drtmle_glm}
+if (exists("results") && "tmle_drglm" %in% names(results) &&
+    "cf_files" %in% names(results$drtmle_glm) && length(results$drtmle_glm$cf_files) > 0L) {
+  stats = evaluate_estimates(results$drtmle_glm, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-drtmle-glm.RData")
+} 
+```
+
+## Analysis: drtmle full
+
+```{r analysis_drtmle_full}
+results$drtmle_full =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_drtmle_full,
+    verbose = TRUE)
+```
+
+## Evaluate: drtmle full
+
+```{r eval_tmle}
+if (exists("results") && "drtmle_full" %in% names(results) &&
+    "cf_files" %in% names(results$drtmle_full) && length(results$drtmle_full$cf_files) > 0L) {
+  stats = evaluate_estimates(results$drtmle_full, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-drtmle-full.RData")
+}
+```
+
+## Analysis: final data
+
+```{r analysis_final}
+results$final =
+  run_analysis(
+    input_dir_counterfactuals = "data-raw/test_censoring_factuals",
+    input_file_covariates = conf$input_file_covariates,
+    #tmle_wrapper = wrapper_drtmle_full,
+    tmle_wrapper = wrapper_drtmle_glm,
+    verbose = TRUE)
+```
+
+
 ## Create output files
 
 ```{r create_output}
 output_files =
   create_output_files(
-    results$revere,
+    results$final,
     output_file_ate = conf$output_file_ate,
     output_dir_ipo = conf$output_dir_ipo,
     verbose = TRUE)

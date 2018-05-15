@@ -1,4 +1,4 @@
-# This pull the file load and merging part out of run_analysis()
+# This pulls the file load and merging part out of run_analysis()
 # TODO: Need to update run_analysis() to remove the file load/merging part,
 # and operate on the output of construct_datasets().
 # This will facilitate analysis of our own simulated data.

@@ -114,13 +114,20 @@ else
 	${R} $< ${OUTPUT_DIR}/$<.out &
 endif
 
-# TODO: upgrade to use 4-8 nodes.
 savio: analysis-savio.R
 ifeq (${JOB_ENGINE},slurm)
 	${SBATCH} --nodes 20 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
 else
 	${R} $< ${OUTPUT_DIR}/$<.out &
 endif
+
+drtmle: savio-drtmle.R
+ifeq (${JOB_ENGINE},slurm)
+	${SBATCH} --nodes 20 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
+else
+	${R} $< ${OUTPUT_DIR}/$<.out &
+endif
+
 
 # Start a bash session with 2 nodes, for up to 12 hours.
 # TODO: support non-Savio execution.
