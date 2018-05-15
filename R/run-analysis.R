@@ -61,7 +61,7 @@ run_analysis =
   estimation_results = future.apply::future_lapply(files,
   # Ensure that workers have all relevant libraries available.
   # TODO: add github packages (may need a helper function)
-    future.packages = attr(startup, "packages_cran"),
+    future.packages = c(attr(startup, "packages_cran"), "ck37r"),
     # future.globals = c("aorder"),
     FUN = function(file) {
     # Measure the execution time needed to analyze each file.
@@ -164,6 +164,13 @@ run_analysis =
       "ipos" = tmle_result$ipo_df,
       "time_elapsed" = time_elapsed["elapsed"]
     )
+
+
+    # Save results to file so that we can see our progress when running in parallel,
+    # and to potentially allow importing tho files for review/analysis.
+    if (dir.exists("temp")) {
+      save(result, file = paste0("temp/", ufid, ".RData"))
+    }
     
     result
   #}

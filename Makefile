@@ -114,7 +114,7 @@ else
 	${R} $< ${OUTPUT_DIR}/$<.out &
 endif
 
-savio: analysis-savio.R
+revere: savio-revere.R
 ifeq (${JOB_ENGINE},slurm)
 	${SBATCH} --nodes 20 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
 else
@@ -123,10 +123,20 @@ endif
 
 drtmle: savio-drtmle.R
 ifeq (${JOB_ENGINE},slurm)
-	${SBATCH} --nodes 20 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
+  # 1 co_biostat node is being used, temporarily reduce to 19 (from 20 max)
+	${SBATCH} --nodes 19 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
 else
 	${R} $< ${OUTPUT_DIR}/$<.out &
 endif
+
+final: savio-final.R
+ifeq (${JOB_ENGINE},slurm)
+  # 1 co_biostat node is being used, temporarily reduce to 19 (from 20 max)
+	${SBATCH} --nodes 19 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
+else
+	${R} $< ${OUTPUT_DIR}/$<.out &
+endif
+
 
 
 # Start a bash session with 2 nodes, for up to 12 hours.

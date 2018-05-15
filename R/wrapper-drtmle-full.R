@@ -46,7 +46,7 @@ wrapper_drtmle_full =
   #####
   # Copy code from 2017 entry.
     
-  conf = list(parallel = FALSE, max_cores = 20L)
+  conf = list(parallel = FALSE, max_cores = 10L)
     
   # Setup parallelization? Use up to 4 cores.
   num_cores = RhpcBLASctl::get_num_cores()
@@ -80,10 +80,27 @@ wrapper_drtmle_full =
   .GlobalEnv$g_screener = function(...) screen.select_vars(..., vars = covariates_g)
   .GlobalEnv$c_screener = function(...) screen.select_vars(..., vars = covariates_c)
 
+  # This grid is going directly into the wrapper to ensure that the learners
+  # are exported across a Savio cluster.
+  # Multiple versions of XGBoost if we can afford the extra computation.
+  # Keep the grid pretty small: 6 learners.
+  #sl_xgb = create.Learner("SL.xgb", detailed_names = T,
+  sl_xgb = create.Learner("SL.xgboost", detailed_names = T,
+                        params = list(nthread = RhpcBLASctl::get_num_cores(),
+                                      ntrees = 1000L),
+                        tune = list(max_depth = c(2, 4, 8),
+                                    shrinkage = c(0.001, 0.01)),
+                        # Putting in global env to help Savio parallelization
+                        env = .GlobalEnv)
 
   # This is a simple reference so that future will find this object and send to parallel
   # worker nodes when running on Savio.
-  SL.ranger_fast
+  SL.ranger_fast2
+  SL.dbarts_fast
+  SL.dbarts2_fast
+  SL.dbarts
+  ck37r::SL.bartMachine2
+  ck37r::SL.mgcv
   
   q_lib = c(list("SL.mean"),
             # Add q_screener to all remaining learners.
@@ -91,7 +108,7 @@ wrapper_drtmle_full =
              #"SL.glmnet_fast",
              "SL.ranger_fast2",
              sl_xgb$names,
-             "SL.dbarts_fast",
+             #"SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
              #"SL.bartMachine2",
              "SL.nnet"),
@@ -104,7 +121,7 @@ wrapper_drtmle_full =
              #"SL.glmnet_fast",
              "SL.ranger_fast2",
              sl_xgb$names,
-             "SL.dbarts_fast",
+             #"SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
              # "SL.bartMachine2",
              "SL.nnet"),
@@ -118,24 +135,24 @@ wrapper_drtmle_full =
              "SL.ranger_fast2",
              sl_xgb$names,
              # SL.bartMachine2 or dbarts?
-             "SL.dbarts_fast",
+             #"SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
-             # "SL.bartMachine2",
+             #"SL.bartMachine2",
              "SL.nnet"),
            function(learner) c(learner, "c_screener")))
   
   # Reduced form estimation.
   # SL.npreg2 is too slow.
   #qr_lib = c("SL.mean", "SL.glm", "SL.npreg")
-  qr_lib = c("SL.mean", "SL.glm",
+  qr_lib = c("SL.mean", "SL.glm")#,
             # "SL.npreg2",
-             "SL.earth",
-             "SL.mgcv")
+            # "SL.earth",
+  #           "SL.mgcv")
   #gr_lib = c("SL.mean", "SL.glm", "SL.npreg")
-  gr_lib = c("SL.mean", "SL.glm",
+  gr_lib = c("SL.mean", "SL.glm")#,
             # "SL.npreg2",
-             "SL.earth",
-             "SL.mgcv")
+            # "SL.earth",
+             #"SL.mgcv")
   
   #####
   # Run estimator
