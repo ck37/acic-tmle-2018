@@ -103,6 +103,10 @@ wrapper_tmle_better =
     "SL.bartMachine2",
     "SL.mean"))
   
+  if(F){
+    q_lib = "SL.mean"
+  }
+  
   #q_lib = g_lib = sl_lib
   g_lib = q_lib
   
@@ -140,7 +144,7 @@ wrapper_tmle_better =
          ci_left = tmle_result$estimates$ATE$CI[1],
          ci_right = tmle_result$estimates$ATE$CI[2],
          # Dataframe of individual potential outcomes.
-         potential_outcomes = potential_outcomes_df)
+         ipo_df = potential_outcomes_df)
   
   # These results will be processed within R/estimate-ate.R
   return(results)
