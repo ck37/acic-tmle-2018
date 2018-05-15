@@ -76,6 +76,11 @@ wrapper_drtmle_full =
   .GlobalEnv$q_screener = function(...) screen.select_vars(..., vars = covariates_Q)
   .GlobalEnv$g_screener = function(...) screen.select_vars(..., vars = covariates_g)
   .GlobalEnv$c_screener = function(...) screen.select_vars(..., vars = covariates_c)
+
+
+  # This is a simple reference so that future will find this object and send to parallel
+  # worker nodes when running on Savio.
+  SL.ranger_fast
   
   q_lib = c(list("SL.mean"),
             # Add q_screener to all remaining learners.
