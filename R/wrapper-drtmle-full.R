@@ -13,7 +13,7 @@ wrapper_drtmle_full =
   # This function name would be passed into run_analyis() and would be
   # executed within R/estimate-ate.R
   if (verbose) {
-    cat("\nwrapper_drtmle_glm() - begin.\n")
+    cat("\nwrapper_drtmle_glm() - begin. cv-tmle folds:", cv_folds, "\n")
   }
   
   ##############
@@ -62,6 +62,9 @@ wrapper_drtmle_full =
     cat("Cores used:", use_cores, "\n")
   }
   
+  # Speed up bartMachine by enabling multicore execution.
+  bartMachine::set_bart_machine_num_cores(use_cores)
+  
   #####
   # Define probability family for outcome.
   
@@ -86,14 +89,42 @@ wrapper_drtmle_full =
             # Add q_screener to all remaining learners.
     lapply(c("SL.glm",
              #"SL.glmnet_fast",
-             "SL.ranger_fast",
+             "SL.ranger_fast2",
+             sl_xgb$names,
+             "SL.dbarts_fast",
+             # Much slower, tho may be due in part to settings differences:
+             #"SL.bartMachine2",
              "SL.nnet"),
            function(learner) c(learner, "q_screener")))
-  g_lib = list("SL.mean", c("SL.glm", "g_screener"))
-  c_lib = list("SL.mean", c("SL.glm", "c_screener"))
+  
+  #g_lib = list("SL.mean", c("SL.glm", "g_screener"))
+  g_lib = c(list("SL.mean"),
+            # Add q_screener to all remaining learners.
+    lapply(c("SL.glm",
+             #"SL.glmnet_fast",
+             "SL.ranger_fast2",
+             sl_xgb$names,
+             "SL.dbarts_fast",
+             # Much slower, tho may be due in part to settings differences:
+             # "SL.bartMachine2",
+             "SL.nnet"),
+           function(learner) c(learner, "g_screener")))
+  
+  #c_lib = list("SL.mean", c("SL.glm", "c_screener"))
+  c_lib = c(list("SL.mean"),
+            # Add q_screener to all remaining learners.
+    lapply(c("SL.glm",
+             #"SL.glmnet_fast",
+             "SL.ranger_fast2",
+             sl_xgb$names,
+             # SL.bartMachine2 or dbarts?
+             "SL.dbarts_fast",
+             # Much slower, tho may be due in part to settings differences:
+             # "SL.bartMachine2",
+             "SL.nnet"),
+           function(learner) c(learner, "c_screener")))
   
   # Reduced form estimation.
-  #qr_lib = list("SL.mean", c("SL.glm", "q_screener"))
   qr_lib = c("SL.mean", "SL.glm", "SL.npreg")
   gr_lib = c("SL.mean", "SL.glm", "SL.npreg")
   

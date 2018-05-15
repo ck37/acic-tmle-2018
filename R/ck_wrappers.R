@@ -68,12 +68,16 @@ length(sl_ksvm$names)
 # Multithreaded version of XGBoost when using sequential SuperLearner.
 SL.xgboost_fast = function(...) SL.xgboost(..., nthread = RhpcBLASctl::get_num_cores())
 
+# Not clear yet if this does anything.
+SL.dbarts_fast = function(...) SL.dbarts(..., nthread = RhpcBLASctl::get_num_cores())
+
 # Faster glmnet.
 # TODO: use multicore via foreach for glmnet.
 SL.glmnet_fast = function(...) SL.glmnet(..., nlambda = 20, nfolds = 5)
 
 # Faster ranger (itself a faster version of RF).
 SL.ranger_fast = function(...) SL.ranger(..., num.trees = 200, num.threads = RhpcBLASctl::get_num_cores())
+SL.ranger_fast2 = function(...) SL.ranger(..., min.node.size = 50L, num.trees = 200, num.threads = RhpcBLASctl::get_num_cores())
 
 # Restrict to top 4 variables based on univariate correlation.
 # TODO: keep treatment indicator in if we're running outcome regression.
