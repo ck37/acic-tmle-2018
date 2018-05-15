@@ -8,6 +8,7 @@ run_analysis =
     input_pattern = "(?<!_cf)\\.csv$",
     input_cf_pattern = "_cf.csv$",
     input_file_covariates = "data-raw/x.csv",
+    cache_dir = "temp",
     id_field = "sample_id",
     outcome_field = "y",
     treatment_field = "z",
@@ -56,9 +57,69 @@ run_analysis =
   
   # Looping over all "factual" files.
   cat("\nBegin processing factual datasets.\n")
+
+  # First check for cached data.
+  skip_results = lapply(files, FUN = function(file) {
+    # ufid = filename without the enclosing directory.
+    ufid = gsub("^.*/([^./]+?)\\.csv$", "\\1", file, perl = TRUE)
+
+  # Potentially limit to a set of ufids that were specified.
+    if (!is.null(specific_files)) {
+      if (!ufid %in% specific_files) {
+        if (verbose) {
+          cat("Skipping", ufid, "- not one of the specific files.\n")
+        }
+        
+        # Return a null result
+        return(list("ufid" = ufid, file = file, result_type = "skip"))
+
+        #return(list(
+        #  "ufid" = NULL,
+        #  "ate_result" = NULL,
+        #  # Individual potential outcomes
+        #  "ipos" = NULL,
+        #  "time_elapsed" = NULL
+        #))
+      }
+    }
+
+   # Check for a cached result.
+    cache_file = paste0(cache_dir, "/", ufid, ".RData")
+    if (dir.exists(cache_dir) && file.exists(cache_file)) {
+      cat("Found", ufid, "in cache - loading saved results.\n")
+      # Object will be a list obj called "result"
+      load(cache_file)
+      result$file = file
+      result$result_type = "cache"
+      return(result)
+    }
+
+    # Otherwise we have nothing.
+    return(NULL)
+
+  })
+
+  # TODO: figure out a better implementation.
+  files_to_skip = NULL
+  cached_results = NULL
+  for (result in skip_results) {
+    if (!is.null(result) && "file" %in% names(result)) {
+      files_to_skip = c(files_to_skip, result$file)
+      if (result$result_type == "cache") {
+        cached_results = c(cached_results, result)
+      }
+    }
+  }
+
+  if (verbose) {
+    cat("Skipping the analysis of up to", length(files_to_skip), "files.\n")
+  }
+
+  # Now restrict to files that are not cached and need to be analyzed.
+  remaining_files = setdiff(files, files_to_skip)
   
   # for (file in files) {
-  estimation_results = future.apply::future_lapply(files,
+  estimation_results = future.apply::future_lapply(remaining_files,
   # Ensure that workers have all relevant libraries available.
   # TODO: add github packages (may need a helper function)
     future.packages = c(attr(startup, "packages_cran"), "ck37r"),
@@ -91,7 +152,9 @@ run_analysis =
     if (verbose) {
       cat("Processing dataset", ufid, "file", which(file == files), "of", length(files), "\n")
     }
-    
+
+
+        
     # Import one counterfactual file
     # Column names are sample_id, z (treatment), and y (outcome)
     # Add full path to help parallelization on savio.
@@ -168,13 +231,16 @@ run_analysis =
 
     # Save results to file so that we can see our progress when running in parallel,
     # and to potentially allow importing tho files for review/analysis.
-    if (dir.exists("temp")) {
-      save(result, file = paste0("temp/", ufid, ".RData"))
+    if (dir.exists(cache_dir)) {
+      save(result, file = cache_file)
     }
     
     result
   #}
   })
+
+  # Add in any extra cached results.
+  estimation_results = c(estimation_results, cached_results)
   
   # Extract ate_results and integrate into dataframe.
   ate_df = do.call(rbind.data.frame,
