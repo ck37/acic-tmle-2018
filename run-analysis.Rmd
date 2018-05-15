@@ -239,6 +239,8 @@ results$final =
     #tmle_wrapper = wrapper_drtmle_full,
     tmle_wrapper = wrapper_drtmle_glm,
     verbose = TRUE)
+save(results,
+     file = "data/results-final.RData")
 ```
 
 
