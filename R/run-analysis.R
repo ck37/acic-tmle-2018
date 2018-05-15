@@ -164,6 +164,13 @@ run_analysis =
       "ipos" = tmle_result$ipo_df,
       "time_elapsed" = time_elapsed["elapsed"]
     )
+
+
+    # Save results to file so that we can see our progress when running in parallel,
+    # and to potentially allow importing tho files for review/analysis.
+    if (dir.exists("temp")) {
+      save(result, file = paste0("temp/", ufid, ".RData"))
+    }
     
     result
   #}
