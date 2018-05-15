@@ -70,6 +70,7 @@ SL.xgboost_fast = function(...) SL.xgboost(..., nthread = RhpcBLASctl::get_num_c
 
 # Not clear yet if this does anything.
 SL.dbarts_fast = function(...) SL.dbarts(..., nthread = RhpcBLASctl::get_num_cores())
+SL.dbarts2_fast = function(...) SL.dbarts2(..., nthread = RhpcBLASctl::get_num_cores())
 
 # Faster glmnet.
 # TODO: use multicore via foreach for glmnet.
