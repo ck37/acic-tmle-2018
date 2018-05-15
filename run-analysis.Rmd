@@ -179,6 +179,29 @@ if (exists("results") && "tmle" %in% names(results) &&
 }
 ```
 
+## Analysis: drtmle full
+
+```{r analysis_drtmle_full}
+results$drtmle_full =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_drtmle_full,
+    verbose = TRUE)
+```
+
+## Evaluate: drtmle full
+
+```{r eval_tmle}
+if (exists("results") && "drtmle_full" %in% names(results) &&
+    "cf_files" %in% names(results$drtmle_full) && length(results$drtmle_full$cf_files) > 0L) {
+  stats = evaluate_estimates(results$drtmle_full, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-drtmle-full.RData")
+}
+```
+
 ## Create output files
 
 ```{r create_output}
