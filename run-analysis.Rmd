@@ -229,12 +229,25 @@ if (exists("results") && "drtmle_full" %in% names(results) &&
 }
 ```
 
+## Analysis: final data
+
+```{r analysis_final}
+results$final =
+  run_analysis(
+    input_dir_counterfactuals = "data-raw/test_censoring_factuals",
+    input_file_covariates = conf$input_file_covariates,
+    #tmle_wrapper = wrapper_drtmle_full,
+    tmle_wrapper = wrapper_drtmle_glm,
+    verbose = TRUE)
+```
+
+
 ## Create output files
 
 ```{r create_output}
 output_files =
   create_output_files(
-    results$revere,
+    results$final,
     output_file_ate = conf$output_file_ate,
     output_dir_ipo = conf$output_dir_ipo,
     verbose = TRUE)
