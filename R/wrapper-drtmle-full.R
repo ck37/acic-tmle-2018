@@ -80,10 +80,24 @@ wrapper_drtmle_full =
   .GlobalEnv$g_screener = function(...) screen.select_vars(..., vars = covariates_g)
   .GlobalEnv$c_screener = function(...) screen.select_vars(..., vars = covariates_c)
 
+  # This grid is going directly into the wrapper to ensure that the learners
+  # are exported across a Savio cluster.
+  # Multiple versions of XGBoost if we can afford the extra computation.
+  # Keep the grid pretty small: 6 learners.
+  #sl_xgb = create.Learner("SL.xgb", detailed_names = T,
+  sl_xgb = create.Learner("SL.xgboost", detailed_names = T,
+                        params = list(nthread = RhpcBLASctl::get_num_cores(),
+                                      ntrees = 1000L),
+                        tune = list(max_depth = c(2, 4, 8),
+                                    shrinkage = c(0.001, 0.01)),
+                        # Putting in global env to help Savio parallelization
+                        env = .GlobalEnv)
 
   # This is a simple reference so that future will find this object and send to parallel
   # worker nodes when running on Savio.
-  SL.ranger_fast
+  SL.ranger_fast2
+  SL.dbarts_fast
+  ck37r::SL.mgcv
   
   q_lib = c(list("SL.mean"),
             # Add q_screener to all remaining learners.
@@ -129,12 +143,12 @@ wrapper_drtmle_full =
   #qr_lib = c("SL.mean", "SL.glm", "SL.npreg")
   qr_lib = c("SL.mean", "SL.glm",
             # "SL.npreg2",
-             "SL.earth",
+            # "SL.earth",
              "SL.mgcv")
   #gr_lib = c("SL.mean", "SL.glm", "SL.npreg")
   gr_lib = c("SL.mean", "SL.glm",
             # "SL.npreg2",
-             "SL.earth",
+            # "SL.earth",
              "SL.mgcv")
   
   #####
