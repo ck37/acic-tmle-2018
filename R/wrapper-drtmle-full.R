@@ -46,7 +46,7 @@ wrapper_drtmle_full =
   #####
   # Copy code from 2017 entry.
     
-  conf = list(parallel = FALSE, max_cores = 20L)
+  conf = list(parallel = FALSE, max_cores = 10L)
     
   # Setup parallelization? Use up to 4 cores.
   num_cores = RhpcBLASctl::get_num_cores()
@@ -99,6 +99,7 @@ wrapper_drtmle_full =
   SL.dbarts_fast
   SL.dbarts2_fast
   SL.dbarts
+  ck37r::SL.bartMachine2
   ck37r::SL.mgcv
   
   q_lib = c(list("SL.mean"),
@@ -107,7 +108,7 @@ wrapper_drtmle_full =
              #"SL.glmnet_fast",
              "SL.ranger_fast2",
              sl_xgb$names,
-             "SL.dbarts2_fast",
+             #"SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
              #"SL.bartMachine2",
              "SL.nnet"),
@@ -120,7 +121,7 @@ wrapper_drtmle_full =
              #"SL.glmnet_fast",
              "SL.ranger_fast2",
              sl_xgb$names,
-             "SL.dbarts2_fast",
+             #"SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
              # "SL.bartMachine2",
              "SL.nnet"),
@@ -134,9 +135,9 @@ wrapper_drtmle_full =
              "SL.ranger_fast2",
              sl_xgb$names,
              # SL.bartMachine2 or dbarts?
-             "SL.dbarts2_fast",
+             #"SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
-             # "SL.bartMachine2",
+             #"SL.bartMachine2",
              "SL.nnet"),
            function(learner) c(learner, "c_screener")))
   

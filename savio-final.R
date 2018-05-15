@@ -6,7 +6,7 @@ source("R/function_library.R")
 conf = list(
   # Maximum amount of memory to allow rJava heap to use for bartMachine.
   # Defaults to 16g but use options(java.mem = "20g") to change.
-  java_mem = getOption("java.mem", "16g")
+  java_mem = getOption("java.mem", "48g")
 )
 
 # Load/install necessary packages.
