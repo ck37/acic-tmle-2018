@@ -65,13 +65,15 @@ wrapper_tmle_better =
   # Setup SL libraries.
   
   q_lib = c(list(# speedglm doesn't work :/ just use plain ol' glm.
-    c("SL.speedglm", "All", "screen.corRank8", "prescreen_nosqr")#,
+    c("SL.glm", "All", "screen.corRank8", "prescreen_nosqr")#,
     #c("SL.mgcv", "All", "prescreen.nosq"),
     #c("sg.gbm.2500", "prescreen.nocat"),
   ),
   # create.Learner() grids.
   #sl_glmnet_em15$names,
-  sl_xgb$names,
+  # sl_xgb$names,
+  "SL.xgboost_cv",
+  # c("SL.hal9001", "screen.corRank8"),
   list(
     #"SL.randomForest_fast",
     #"SL.xgboost_fast",
@@ -85,7 +87,7 @@ wrapper_tmle_better =
     "SL.mean"))
   
   # Need a separate g lib that does not include effect modification learners.
-  g_lib = c(list(c("SL.speedglm", "All", "screen.corRank8", "prescreen.nosq"),
+  g_lib = c(list(c("SL.glm", "All", "screen.corRank8", "prescreen.nosq"),
                  #c("SL.mgcv", "All", "prescreen.nosq"),
                  #c("sg.gbm.2500", "prescreen.nocat"),
                  #"SL.xgboost_fast",
@@ -104,7 +106,7 @@ wrapper_tmle_better =
     "SL.mean"))
   
   if(F){
-    q_lib = "SL.mean"
+    q_lib = list(c("SL.xgboost_cv"))
   }
   
   #q_lib = g_lib = sl_lib
