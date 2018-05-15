@@ -120,8 +120,17 @@ wrapper_drtmle_full =
            function(learner) c(learner, "c_screener")))
   
   # Reduced form estimation.
-  qr_lib = c("SL.mean", "SL.glm", "SL.npreg")
-  gr_lib = c("SL.mean", "SL.glm", "SL.npreg")
+  # SL.npreg2 is too slow.
+  #qr_lib = c("SL.mean", "SL.glm", "SL.npreg")
+  qr_lib = c("SL.mean", "SL.glm",
+            # "SL.npreg2",
+             "SL.earth",
+             "SL.mgcv")
+  #gr_lib = c("SL.mean", "SL.glm", "SL.npreg")
+  gr_lib = c("SL.mean", "SL.glm",
+            # "SL.npreg2",
+             "SL.earth",
+             "SL.mgcv")
   
   #####
   # Run estimator
