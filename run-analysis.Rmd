@@ -76,6 +76,7 @@ results$revere_glm =
     input_dir_counterfactuals = conf$input_dir_counterfactuals,
     input_file_covariates = conf$input_file_covariates,
     tmle_wrapper = wrapper_revere_glm,
+    screen_alpha = 0.1,
     verbose = TRUE)
 ```
 
@@ -176,6 +177,32 @@ if (exists("results") && "tmle" %in% names(results) &&
   print(stats)
   save(results, stats,
        file = "data/results-stats-tmle.RData")
+}
+```
+
+## Analysis: drtmle-glm
+
+```{r analysis_drtmle_glm}
+results$drtmle_glm =
+  run_analysis(
+    input_dir_counterfactuals = conf$input_dir_counterfactuals,
+    input_file_covariates = conf$input_file_covariates,
+    tmle_wrapper = wrapper_drtmle_glm,
+    # Need to do stratified cross-validation. Should fit SL outside of tmle.
+    #specific_files = c("9333a461d3944d089ef60cdf3b88fd40"),
+    #specific_files = c("e36aca1030264e638452ea4053cbb42c"),
+    verbose = TRUE)
+```
+
+## Evaluate: drtmle-glm
+
+```{r eval_drtmle_glm}
+if (exists("results") && "tmle_drglm" %in% names(results) &&
+    "cf_files" %in% names(results$drtmle_glm) && length(results$drtmle_glm$cf_files) > 0L) {
+  stats = evaluate_estimates(results$drtmle_glm, verbose = TRUE)
+  print(stats)
+  save(results, stats,
+       file = "data/results-stats-drtmle-glm.RData")
 }
 ```
 
