@@ -97,6 +97,8 @@ wrapper_drtmle_full =
   # worker nodes when running on Savio.
   SL.ranger_fast2
   SL.dbarts_fast
+  SL.dbarts2_fast
+  SL.dbarts
   ck37r::SL.mgcv
   
   q_lib = c(list("SL.mean"),
@@ -105,7 +107,7 @@ wrapper_drtmle_full =
              #"SL.glmnet_fast",
              "SL.ranger_fast2",
              sl_xgb$names,
-             "SL.dbarts_fast",
+             "SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
              #"SL.bartMachine2",
              "SL.nnet"),
@@ -118,7 +120,7 @@ wrapper_drtmle_full =
              #"SL.glmnet_fast",
              "SL.ranger_fast2",
              sl_xgb$names,
-             "SL.dbarts_fast",
+             "SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
              # "SL.bartMachine2",
              "SL.nnet"),
@@ -132,7 +134,7 @@ wrapper_drtmle_full =
              "SL.ranger_fast2",
              sl_xgb$names,
              # SL.bartMachine2 or dbarts?
-             "SL.dbarts_fast",
+             "SL.dbarts2_fast",
              # Much slower, tho may be due in part to settings differences:
              # "SL.bartMachine2",
              "SL.nnet"),
