@@ -62,6 +62,9 @@ wrapper_drtmle_full =
     cat("Cores used:", use_cores, "\n")
   }
   
+  # Speed up bartMachine by enabling multicore execution.
+  bartMachine::set_bart_machine_num_cores(use_cores)
+  
   #####
   # Define probability family for outcome.
   
@@ -81,9 +84,11 @@ wrapper_drtmle_full =
             # Add q_screener to all remaining learners.
     lapply(c("SL.glm",
              #"SL.glmnet_fast",
-             "SL.ranger_fast",
+             "SL.ranger_fast2",
              sl_xgb$names,
-             # SL.bartMachine2 or dbarts?
+             "SL.dbarts_fast",
+             # Much slower, tho may be due in part to settings differences:
+             #"SL.bartMachine2",
              "SL.nnet"),
            function(learner) c(learner, "q_screener")))
   
@@ -92,9 +97,11 @@ wrapper_drtmle_full =
             # Add q_screener to all remaining learners.
     lapply(c("SL.glm",
              #"SL.glmnet_fast",
-             "SL.ranger_fast",
+             "SL.ranger_fast2",
              sl_xgb$names,
-             # SL.bartMachine2 or dbarts?
+             "SL.dbarts_fast",
+             # Much slower, tho may be due in part to settings differences:
+             # "SL.bartMachine2",
              "SL.nnet"),
            function(learner) c(learner, "g_screener")))
   
@@ -103,9 +110,12 @@ wrapper_drtmle_full =
             # Add q_screener to all remaining learners.
     lapply(c("SL.glm",
              #"SL.glmnet_fast",
+             "SL.ranger_fast2",
              sl_xgb$names,
              # SL.bartMachine2 or dbarts?
-             "SL.ranger_fast",
+             "SL.dbarts_fast",
+             # Much slower, tho may be due in part to settings differences:
+             # "SL.bartMachine2",
              "SL.nnet"),
            function(learner) c(learner, "c_screener")))
   
