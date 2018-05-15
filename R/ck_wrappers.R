@@ -56,6 +56,11 @@ sl_xgb = create.Learner("SL.xgb", detailed_names = T,
                                     shrinkage = c(0.001, 0.01)))
 length(sl_xgb$names)
 
+# xgboost with early stopping based on internal cross validation
+SL.xgboost_cv_rmse = function(...) {
+  SL.xgboost_cv(..., eval_metric = "rmse", max_depth = 3, early_stopping_rounds = 25)
+}
+
 # Small SVM grid for cost parameter and kernel.
 sl_ksvm = create.Learner("SL.ksvm", detailed_names = T,
                          tune = list(

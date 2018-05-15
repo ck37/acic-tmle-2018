@@ -72,7 +72,7 @@ wrapper_tmle_better =
   # create.Learner() grids.
   #sl_glmnet_em15$names,
   # sl_xgb$names,
-  "SL.xgboost_cv",
+  "SL.xgboost_cv_rmse",
   # c("SL.hal9001", "screen.corRank8"),
   list(
     #"SL.randomForest_fast",
@@ -94,7 +94,8 @@ wrapper_tmle_better =
                  #"SL.xgboost_threads_4",
                  "SL.ranger_fast"#,
   ), # create.Learner() grids.
-  sl_xgb$names,
+  # sl_xgb$names,
+  "SL.xgboost_cv_rmse",
   # Temporarily turn off SVM due to errors Vince is getting.
   #sl_ksvm$names, 
   list(
@@ -106,7 +107,8 @@ wrapper_tmle_better =
     "SL.mean"))
   
   if(F){
-    q_lib = list(c("SL.xgboost_cv"))
+    q_lib = "SL.xgboost_cv_rmse"
+    # q_lib = "SL.xgboost_cv_1"
   }
   
   #q_lib = g_lib = sl_lib
