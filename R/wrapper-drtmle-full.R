@@ -141,15 +141,15 @@ wrapper_drtmle_full =
   # Reduced form estimation.
   # SL.npreg2 is too slow.
   #qr_lib = c("SL.mean", "SL.glm", "SL.npreg")
-  qr_lib = c("SL.mean", "SL.glm",
+  qr_lib = c("SL.mean", "SL.glm")#,
             # "SL.npreg2",
             # "SL.earth",
-             "SL.mgcv")
+  #           "SL.mgcv")
   #gr_lib = c("SL.mean", "SL.glm", "SL.npreg")
-  gr_lib = c("SL.mean", "SL.glm",
+  gr_lib = c("SL.mean", "SL.glm")#,
             # "SL.npreg2",
             # "SL.earth",
-             "SL.mgcv")
+             #"SL.mgcv")
   
   #####
   # Run estimator
