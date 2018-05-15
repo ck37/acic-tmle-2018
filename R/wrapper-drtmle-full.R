@@ -145,6 +145,10 @@ wrapper_drtmle_full =
            W = data[, unique(c(covariates_Q, covariates_g, covariates_c)),
                     drop = FALSE],
            DeltaY = as.integer(!is.na(data[[outcome_field]])),
+           # Explicitly specify the treatment levels to ensure that the order in
+           # the treatment variable doesn't matter.
+           a_0 = c(0, 1),
+           stratify = FALSE,
            SL_Q = q_lib,
            # Treatment and censoring SL libs are both defined through SL_g argument.
            SL_g = list("A" = g_lib, "DeltaY" = c_lib),
@@ -156,11 +160,12 @@ wrapper_drtmle_full =
            # Package will handle family automatically.
            verbose = verbose)
   
+  # This contrast will depend on the order of a_0 as specified above.
   inference = drtmle::ci(est_result, contrast = c(-1, 1))
   
-  # TODO: Create potential outcomes dataframe out of the preds_all dataframe.
-  # Which columns should we use for y0 and y1?
-  potential_outcomes_df = data.frame()
+  # Create potential outcomes dataframe.
+  potential_outcomes_df = data.frame(y0 = est_result$nuisance_aiptw_c$Qn[[1]],
+                                     y1 = est_result$nuisance_aiptw_c$Qn[[2]])
   
   # Compile results.  
   results =
