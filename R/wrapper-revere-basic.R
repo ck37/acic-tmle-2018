@@ -4,8 +4,6 @@ wrapper_revere_basic =
            outcome_field = "y",
            treatment_field = "z",
            id_field = NULL,
-           # This is a list with elements "outcome" and "treatment".
-           # TODO: support "censoring".
            covariate_fields = NULL,
            verbose = FALSE) {
   # This function name would be passed into run_analyis() and would be
@@ -33,7 +31,7 @@ wrapper_revere_basic =
                               nrounds = 1000, eta = .01,
                               nthread = num_cores)
   lrnr_bartMachine = make_learner(Lrnr_bartMachine)
-  lrnr_dbarts = make_learner(Lrnr_dbarts)
+  lrnr_dbarts = Lrnr_dbarts$new(ndpost=1)
   lrnr_grf = make_learner(Lrnr_grf)
   # NOTE: ranger needs to have probability = TRUE for binomial outcomes.
   # Current sl3 implementation doesn't handle this :/
@@ -46,11 +44,11 @@ wrapper_revere_basic =
                  # failing with "system is computationally singular" errors.
                  #lrnr_glm_fast, 
                  # TODO: fix glmnet, is yielding warnings and not working.
-                 # lrnr_glmnet,
+                 lrnr_glmnet,
                  # TODO: increase java memory so we can use bartMachine
                  # lrnr_bartMachine,
-                 # lrnr_dbarts,
-                 # lrnr_grf,
+                 lrnr_dbarts,
+                 lrnr_grf,
                  lrnr_xgboost)
   
   # metalearner_eval_Q = metalearner_logistic_binomial
