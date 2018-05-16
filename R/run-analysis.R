@@ -122,7 +122,7 @@ run_analysis =
   estimation_results = future.apply::future_lapply(remaining_files,
   # Ensure that workers have all relevant libraries available.
   # TODO: add github packages (may need a helper function)
-    future.packages = c(attr(startup, "packages_cran"), "ck37r"),
+    future.packages = c(attr(startup, "packages_cran"), "ck37r", "SuperLearner", "origami", "sl3", "dbarts"),
     # future.globals = c("aorder"),
     FUN = function(file) {
     # Measure the execution time needed to analyze each file.
@@ -232,6 +232,7 @@ run_analysis =
     # Save results to file so that we can see our progress when running in parallel,
     # and to potentially allow importing tho files for review/analysis.
     if (dir.exists(cache_dir)) {
+      cache_file = paste0(cache_dir, "/", ufid, ".RData")
       save(result, file = cache_file)
     }
     
