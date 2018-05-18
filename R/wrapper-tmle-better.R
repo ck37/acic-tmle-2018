@@ -87,7 +87,7 @@ wrapper_tmle_better =
     "SL.mean"))
   
   # Need a separate g lib that does not include effect modification learners.
-  g_lib = c(list(c("SL.glm", "All", "screen.corRank8", "prescreen.nosq"),
+  g_lib = c(list(c("SL.glm", "All", "screen.corRank8", "prescreen_nosq"),
                  #c("SL.mgcv", "All", "prescreen.nosq"),
                  #c("sg.gbm.2500", "prescreen.nocat"),
                  #"SL.xgboost_fast",
