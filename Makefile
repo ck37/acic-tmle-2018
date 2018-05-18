@@ -137,6 +137,23 @@ else
 	${R} $< ${OUTPUT_DIR}/$<.out &
 endif
 
+final-tmle: final-tmle.R
+ifeq (${JOB_ENGINE},slurm)
+  # 1 co_biostat node is being used, temporarily reduce to 19 (from 20 max)
+	${SBATCH} --nodes 9 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
+else
+	${R} $< ${OUTPUT_DIR}/$<.out &
+endif
+
+final-revere: final-revere.R
+ifeq (${JOB_ENGINE},slurm)
+  # 1 co_biostat node is being used, temporarily reduce to 19 (from 20 max)
+	${SBATCH} --nodes 19 --job-name=$< ${SBATCH_R_RMD} --file=$< --dir=${OUTPUT_DIR}
+else
+	${R} $< ${OUTPUT_DIR}/$<.out &
+endif
+
+
 
 
 # Start a bash session with 2 nodes, for up to 12 hours.

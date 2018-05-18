@@ -59,7 +59,9 @@ run_analysis =
   cat("\nBegin processing factual datasets.\n")
 
   # First check for cached data.
-  skip_results = lapply(files, FUN = function(file) {
+  #skip_results = lapply(files, FUN = function(file) {
+  skip_results = list()
+  for (file in files) {
     # ufid = filename without the enclosing directory.
     ufid = gsub("^.*/([^./]+?)\\.csv$", "\\1", file, perl = TRUE)
 
@@ -71,7 +73,8 @@ run_analysis =
         }
         
         # Return a null result
-        return(list("ufid" = ufid, file = file, result_type = "skip"))
+        #return(list("ufid" = ufid, file = file, result_type = "skip"))
+        skip_results[[ufid]] = list("ufid" = ufid, file = file, result_type = "skip")
 
         #return(list(
         #  "ufid" = NULL,
@@ -91,22 +94,23 @@ run_analysis =
       load(cache_file)
       result$file = file
       result$result_type = "cache"
-      return(result)
+      skip_results[[ufid]] = result
     }
 
     # Otherwise we have nothing.
-    return(NULL)
+    #return(NULL)
 
-  })
+  #})
+  }
 
   # TODO: figure out a better implementation.
   files_to_skip = NULL
-  cached_results = NULL
+  cached_results = list()
   for (result in skip_results) {
     if (!is.null(result) && "file" %in% names(result)) {
       files_to_skip = c(files_to_skip, result$file)
       if (result$result_type == "cache") {
-        cached_results = c(cached_results, result)
+        cached_results[[result$ufid]] = result
       }
     }
   }
@@ -122,7 +126,7 @@ run_analysis =
   estimation_results = future.apply::future_lapply(remaining_files,
   # Ensure that workers have all relevant libraries available.
   # TODO: add github packages (may need a helper function)
-    future.packages = c(attr(startup, "packages_cran"), "ck37r"),
+    future.packages = c(attr(startup, "packages_cran"), "ck37r", "SuperLearner", "origami", "sl3", "dbarts"),
     # future.globals = c("aorder"),
     FUN = function(file) {
     # Measure the execution time needed to analyze each file.
@@ -232,6 +236,7 @@ run_analysis =
     # Save results to file so that we can see our progress when running in parallel,
     # and to potentially allow importing tho files for review/analysis.
     if (dir.exists(cache_dir)) {
+      cache_file = paste0(cache_dir, "/", ufid, ".RData")
       save(result, file = cache_file)
     }
     
@@ -239,12 +244,28 @@ run_analysis =
   #}
   })
 
+  save(estimation_results, cached_results, skip_results,
+       file = "data/blah.RData")
+
   # Add in any extra cached results.
-  estimation_results = c(estimation_results, cached_results)
+  if (length(estimation_results) > 0L) {
+    estimation_results = c(estimation_results, cached_results)
+  } else {
+    estimation_results = cached_results
+  }
   
   # Extract ate_results and integrate into dataframe.
   ate_df = do.call(rbind.data.frame,
-                   lapply(estimation_results, `[[`, "ate_result"))
+                   lapply(estimation_results, function(element) {
+                   if ("ate_result" %in% names(element)) {
+                   return(element$ate_result)
+                   } else {
+                   return(NULL)}}))
+
+
+  if (verbose) {
+    cat("ate_df dims:", dim(ate_df), "\n")
+  }
   # Convert ufid back to a string.
   ate_df$ufid = as.character(ate_df$ufid)
   
